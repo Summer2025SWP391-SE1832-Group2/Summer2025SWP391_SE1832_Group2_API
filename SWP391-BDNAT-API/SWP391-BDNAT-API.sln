@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33712.159
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BDNAT-API", "SWP391-BDNAT-API\BDNAT-API.csproj", "{CF8D8EAB-4B6D-4E92-86C0-3070CB0B0FFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BDNAT-Repository", "BDNAT-Repository\BDNAT-Repository.csproj", "{BD648124-6211-4382-BB11-C897C55A9A0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BDNAT-Service", "BDNAT-Service\BDNAT-Service.csproj", "{AA04361E-EE58-4558-856F-B2007CAFFBC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BDNAT-Helper", "BDNAT-Helper\BDNAT-Helper.csproj", "{04943014-E09E-49EF-B932-5D3B3FEA7436}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF8D8EAB-4B6D-4E92-86C0-3070CB0B0FFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF8D8EAB-4B6D-4E92-86C0-3070CB0B0FFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF8D8EAB-4B6D-4E92-86C0-3070CB0B0FFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF8D8EAB-4B6D-4E92-86C0-3070CB0B0FFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD648124-6211-4382-BB11-C897C55A9A0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD648124-6211-4382-BB11-C897C55A9A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD648124-6211-4382-BB11-C897C55A9A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD648124-6211-4382-BB11-C897C55A9A0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA04361E-EE58-4558-856F-B2007CAFFBC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA04361E-EE58-4558-856F-B2007CAFFBC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA04361E-EE58-4558-856F-B2007CAFFBC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA04361E-EE58-4558-856F-B2007CAFFBC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04943014-E09E-49EF-B932-5D3B3FEA7436}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04943014-E09E-49EF-B932-5D3B3FEA7436}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04943014-E09E-49EF-B932-5D3B3FEA7436}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04943014-E09E-49EF-B932-5D3B3FEA7436}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {371660AB-12A9-4733-83E2-8B91F0BB7F19}
+	EndGlobalSection
+EndGlobal
