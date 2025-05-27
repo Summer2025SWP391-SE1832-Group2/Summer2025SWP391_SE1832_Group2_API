@@ -1,0 +1,52 @@
+﻿using AutoMapper;
+using BDNAT_Repository.Entities;
+using BDNAT_Repository.Implementation;
+using BDNAT_Service.DTO;
+using BDNAT_Service.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BDNAT_Service.Implementation
+{
+    public class SampleService : ISampleService
+    {
+        private readonly IMapper _mapper;
+
+        public SampleService(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
+        public async Task<bool> CreateSampleAsync(SampleDTO sample)
+        {
+            var map = _mapper.Map<Sample>(sample);
+            return await SampleRepo.Instance.InsertAsync(map);
+        }
+
+        public async Task<bool> DeleteSampleAsync(int id)
+        {
+            return await SampleRepo.Instance.DeleteAsync(id);
+        }
+
+        public async Task<List<SampleDTO>> GetAllSamplesAsync()
+        {
+            var list = await SampleRepo.Instance.GetAllAsync();
+            return list.Select(x => _mapper.Map<SampleDTO>(x)).ToList();
+        }
+
+        public async Task<SampleDTO> GetSampleByIdAsync(int id)
+        {
+            return _mapper.Map<SampleDTO>(await SampleRepo.Instance.GetByIdAsync(id));
+        }
+
+        public async Task<bool> UpdateSampleAsync(SampleDTO sample)
+        {
+            var map = _mapper.Map<Sample>(sample);
+            return await SampleRepo.Instance.UpdateAsync(map);
+        }
+    }
+
+}
