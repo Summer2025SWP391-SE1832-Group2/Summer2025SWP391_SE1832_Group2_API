@@ -15,5 +15,9 @@ public partial class Transaction
 
     public int? DurationDays { get; set; }
 
+    public int? UserId { get; set; }
+
     public virtual Booking? Booking { get; set; }
+
+    public virtual User? User { get; set; }
 }

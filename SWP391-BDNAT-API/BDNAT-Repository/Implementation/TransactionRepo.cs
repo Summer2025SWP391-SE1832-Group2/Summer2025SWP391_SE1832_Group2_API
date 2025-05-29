@@ -10,5 +10,18 @@ namespace BDNAT_Repository.Implementation
 {
     public class TransactionRepo : GenericRepository<Transaction>, ITransactionRepo
     {
+        private static TransactionRepo _instance;
+
+        public static TransactionRepo Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new TransactionRepo();
+                }
+                return _instance;
+            }
+        }
     }
 }

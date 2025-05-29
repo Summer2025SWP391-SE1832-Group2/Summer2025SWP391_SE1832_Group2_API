@@ -10,5 +10,18 @@ namespace BDNAT_Repository.Implementation
 {
     public class ServiceTypeRepo : GenericRepository<ServiceType>, IServiceTypeRepo
     {
+        private static ServiceTypeRepo _instance;
+
+        public static ServiceTypeRepo Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new ServiceTypeRepo();
+                }
+                return _instance;
+            }
+        }
     }
 }

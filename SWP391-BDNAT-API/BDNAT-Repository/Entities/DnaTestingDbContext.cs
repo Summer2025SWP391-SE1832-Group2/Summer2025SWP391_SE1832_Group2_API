@@ -33,15 +33,17 @@ public partial class DnaTestingDbContext : DbContext
 
     public virtual DbSet<Rating> Ratings { get; set; }
 
-    public virtual DbSet<Result> Results { get; set; }
+    public virtual DbSet<ResultDetail> ResultDetails { get; set; }
 
     public virtual DbSet<Sample> Samples { get; set; }
+
+    public virtual DbSet<SampleCollectionSchedule> SampleCollectionSchedules { get; set; }
+
+    public virtual DbSet<SampleShipment> SampleShipments { get; set; }
 
     public virtual DbSet<Service> Services { get; set; }
 
     public virtual DbSet<ServiceType> ServiceTypes { get; set; }
-
-    public virtual DbSet<ShippingOrder> ShippingOrders { get; set; }
 
     public virtual DbSet<TestKit> TestKits { get; set; }
 
@@ -101,10 +103,12 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.HasOne(d => d.ServiceType).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.ServiceTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Booking__Service__5535A963");
 
             entity.HasOne(d => d.User).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Booking__UserID__5629CD9C");
         });
 
@@ -159,12 +163,8 @@ public partial class DnaTestingDbContext : DbContext
             entity.ToTable("Feedback");
 
             entity.Property(e => e.FeedbackId).HasColumnName("FeedbackID");
-            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
+            entity.Property(e => e.Status).HasMaxLength(10);
             entity.Property(e => e.UserId).HasColumnName("UserID");
-
-            entity.HasOne(d => d.Service).WithMany(p => p.Feedbacks)
-                .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__Feedback__Servic__4CA06362");
 
             entity.HasOne(d => d.User).WithMany(p => p.Feedbacks)
                 .HasForeignKey(d => d.UserId)
@@ -179,20 +179,22 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.KitOrderId).HasColumnName("KitOrderID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
-            entity.Property(e => e.ShippingId).HasColumnName("ShippingID");
+            entity.Property(e => e.OrderDate).HasColumnType("date");
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(10)
+                .IsFixedLength();
+            entity.Property(e => e.ShipToAdress).HasMaxLength(50);
             entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.TestKitId).HasColumnName("TestKitID");
 
             entity.HasOne(d => d.Booking).WithMany(p => p.KitOrders)
                 .HasForeignKey(d => d.BookingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__KitOrder__Bookin__6A30C649");
-
-            entity.HasOne(d => d.Shipping).WithMany(p => p.KitOrders)
-                .HasForeignKey(d => d.ShippingId)
-                .HasConstraintName("FK__KitOrder__Shippi__6B24EA82");
 
             entity.HasOne(d => d.TestKit).WithMany(p => p.KitOrders)
                 .HasForeignKey(d => d.TestKitId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__KitOrder__TestKi__693CA210");
         });
 
@@ -227,23 +229,23 @@ public partial class DnaTestingDbContext : DbContext
                 .HasConstraintName("FK_Rating_Users");
         });
 
-        modelBuilder.Entity<Result>(entity =>
+        modelBuilder.Entity<ResultDetail>(entity =>
         {
-            entity.HasKey(e => e.ResultId).HasName("PK__Result__97690228812C6926");
+            entity.HasKey(e => e.ResultDetailId).HasName("PK__Result__97690228812C6926");
 
-            entity.ToTable("Result");
-
-            entity.Property(e => e.ResultId).HasColumnName("ResultID");
+            entity.Property(e => e.ResultDetailId).HasColumnName("ResultDetailID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.TestParameterId).HasColumnName("TestParameterID");
             entity.Property(e => e.Value).HasMaxLength(100);
 
-            entity.HasOne(d => d.Booking).WithMany(p => p.Results)
+            entity.HasOne(d => d.Booking).WithMany(p => p.ResultDetails)
                 .HasForeignKey(d => d.BookingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Result_Booking");
 
-            entity.HasOne(d => d.TestParameter).WithMany(p => p.Results)
+            entity.HasOne(d => d.TestParameter).WithMany(p => p.ResultDetails)
                 .HasForeignKey(d => d.TestParameterId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Result_TestParameter");
         });
 
@@ -255,7 +257,6 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.SampleId).HasColumnName("SampleID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
-            entity.Property(e => e.CollectedBy).HasMaxLength(100);
             entity.Property(e => e.CollectedDate).HasColumnType("date");
             entity.Property(e => e.ParticipantName).HasMaxLength(100);
             entity.Property(e => e.SampleType).HasMaxLength(100);
@@ -264,6 +265,61 @@ public partial class DnaTestingDbContext : DbContext
             entity.HasOne(d => d.Booking).WithMany(p => p.Samples)
                 .HasForeignKey(d => d.BookingId)
                 .HasConstraintName("FK__Sample__BookingI__628FA481");
+
+            entity.HasOne(d => d.CollectedByNavigation).WithMany(p => p.Samples)
+                .HasForeignKey(d => d.CollectedBy)
+                .HasConstraintName("FK_Sample_Users");
+        });
+
+        modelBuilder.Entity<SampleCollectionSchedule>(entity =>
+        {
+            entity.HasKey(e => e.ScheduleId);
+
+            entity.ToTable("SampleCollectionSchedule");
+
+            entity.Property(e => e.ScheduleId)
+                .ValueGeneratedNever()
+                .HasColumnName("ScheduleID");
+            entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.CollectionDate).HasColumnType("date");
+            entity.Property(e => e.CollectorId).HasColumnName("CollectorID");
+            entity.Property(e => e.Location).HasMaxLength(50);
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .IsFixedLength();
+
+            entity.HasOne(d => d.Booking).WithMany(p => p.SampleCollectionSchedules)
+                .HasForeignKey(d => d.BookingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SampleCollectionSchedule_Booking");
+
+            entity.HasOne(d => d.Collector).WithMany(p => p.SampleCollectionSchedules)
+                .HasForeignKey(d => d.CollectorId)
+                .HasConstraintName("FK_SampleCollectionSchedule_Users");
+        });
+
+        modelBuilder.Entity<SampleShipment>(entity =>
+        {
+            entity.HasKey(e => e.SampleShipmentId).HasName("PK__Shipping__5FACD460BD8C606F");
+
+            entity.ToTable("SampleShipment");
+
+            entity.Property(e => e.SampleShipmentId).HasColumnName("SampleShipmentID");
+            entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.ShipDate).HasColumnType("datetime");
+            entity.Property(e => e.Status).HasColumnType("datetime");
+            entity.Property(e => e.ToAddress).HasMaxLength(50);
+
+            entity.HasOne(d => d.Booking).WithMany(p => p.SampleShipments)
+                .HasForeignKey(d => d.BookingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SampleShipment_Booking");
+
+            entity.HasOne(d => d.CollectedByNavigation).WithMany(p => p.SampleShipments)
+                .HasForeignKey(d => d.CollectedBy)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SampleShipment_Users");
         });
 
         modelBuilder.Entity<Service>(entity =>
@@ -290,19 +346,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.HasOne(d => d.Service).WithMany(p => p.ServiceTypes)
                 .HasForeignKey(d => d.ServiceId)
                 .HasConstraintName("FK__ServiceTy__Servi__48CFD27E");
-        });
-
-        modelBuilder.Entity<ShippingOrder>(entity =>
-        {
-            entity.HasKey(e => e.ShippingId).HasName("PK__Shipping__5FACD460BD8C606F");
-
-            entity.Property(e => e.ShippingId).HasColumnName("ShippingID");
-            entity.Property(e => e.Address).HasMaxLength(255);
-            entity.Property(e => e.CreateAt).HasColumnType("datetime");
-            entity.Property(e => e.Receiver).HasMaxLength(100);
-            entity.Property(e => e.ShipperName).HasMaxLength(100);
-            entity.Property(e => e.Status).HasMaxLength(50);
-            entity.Property(e => e.UpdateAt).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<TestKit>(entity =>
@@ -342,10 +385,15 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.TransactionId).HasColumnName("TransactionID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
 
             entity.HasOne(d => d.Booking).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.BookingId)
                 .HasConstraintName("FK__Transacti__Booki__5FB337D6");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_Transaction_Users");
         });
 
         modelBuilder.Entity<User>(entity =>

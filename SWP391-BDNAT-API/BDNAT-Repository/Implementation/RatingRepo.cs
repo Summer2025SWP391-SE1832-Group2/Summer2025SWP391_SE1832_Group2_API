@@ -10,5 +10,18 @@ namespace BDNAT_Repository.Implementation
 {
     public class RatingRepo : GenericRepository<Rating>, IRatingRepo
     {
+        private static RatingRepo _instance;
+
+        public static RatingRepo Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new RatingRepo();
+                }
+                return _instance;
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@ public partial class Sample
 
     public int? BookingId { get; set; }
 
-    public string? CollectedBy { get; set; }
+    public int? CollectedBy { get; set; }
 
     public DateTime? CollectedDate { get; set; }
 
@@ -24,4 +24,6 @@ public partial class Sample
     public string? Transport { get; set; }
 
     public virtual Booking? Booking { get; set; }
+
+    public virtual User? CollectedByNavigation { get; set; }
 }

@@ -7,17 +7,21 @@ public partial class KitOrder
 {
     public int KitOrderId { get; set; }
 
-    public int? TestKitId { get; set; }
+    public int TestKitId { get; set; }
 
-    public int? BookingId { get; set; }
+    public int BookingId { get; set; }
 
-    public int? ShippingId { get; set; }
+    public string Status { get; set; } = null!;
 
-    public string? Status { get; set; }
+    public int Quantity { get; set; }
 
-    public virtual Booking? Booking { get; set; }
+    public string ShipToAdress { get; set; } = null!;
 
-    public virtual ShippingOrder? Shipping { get; set; }
+    public string PhoneNumber { get; set; } = null!;
 
-    public virtual TestKit? TestKit { get; set; }
+    public DateTime OrderDate { get; set; }
+
+    public virtual Booking Booking { get; set; } = null!;
+
+    public virtual TestKit TestKit { get; set; } = null!;
 }

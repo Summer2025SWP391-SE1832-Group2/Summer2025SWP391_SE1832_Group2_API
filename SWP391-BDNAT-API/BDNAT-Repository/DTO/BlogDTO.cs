@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BDNAT_Service.DTO
+namespace BDNAT_Repository.DTO
 {
     public class BlogDTO
     {

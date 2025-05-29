@@ -10,5 +10,18 @@ namespace BDNAT_Repository.Implementation
 {
     public class SampleRepo : GenericRepository<Sample>, ISampleRepo
     {
+        private static SampleRepo _instance;
+
+        public static SampleRepo Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new SampleRepo();
+                }
+                return _instance;
+            }
+        }
     }
 }

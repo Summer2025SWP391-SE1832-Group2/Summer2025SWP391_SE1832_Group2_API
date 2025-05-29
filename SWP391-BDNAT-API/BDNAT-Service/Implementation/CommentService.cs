@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BDNAT_Repository.Entities;
 using BDNAT_Repository.Implementation;
-using BDNAT_Service.DTO;
+using BDNAT_Repository.DTO;
 using BDNAT_Service.Interface;
 using System;
 using System.Collections.Generic;

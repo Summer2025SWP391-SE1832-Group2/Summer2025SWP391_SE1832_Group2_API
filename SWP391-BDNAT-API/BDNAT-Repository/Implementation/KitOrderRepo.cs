@@ -10,5 +10,18 @@ namespace BDNAT_Repository.Implementation
 {
     public class KitOrderRepo : GenericRepository<KitOrder>, IKitOrderRepo
     {
+        private static KitOrderRepo _instance;
+
+        public static KitOrderRepo Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new KitOrderRepo();
+                }
+                return _instance;
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using BDNAT_Service.DTO;
+﻿using BDNAT_Repository.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

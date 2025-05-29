@@ -1,4 +1,4 @@
-using BDNAT_Helper;
+using BDNAT_Repository;
 using BDNAT_Service.Implementation;
 using BDNAT_Service.Interface;
 
@@ -11,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IBlogsTypeService, BlogsTypeService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -29,22 +30,23 @@ builder.Services.AddScoped<ITestKitService, TestKitService>();
 builder.Services.AddScoped<ITestParameterService, TestParameterService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        builder
-            .SetIsOriginAllowed(_ => true)
-            .AllowAnyMethod()
+        policy
+            .SetIsOriginAllowed(_ => true) // Replace with actual frontend URL
             .AllowAnyHeader()
-            .AllowCredentials(); // Important for SignalR
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
+app.UseCors("AllowAll");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

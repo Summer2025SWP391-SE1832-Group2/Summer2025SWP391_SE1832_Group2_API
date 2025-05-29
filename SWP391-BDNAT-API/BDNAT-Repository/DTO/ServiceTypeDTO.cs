@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BDNAT_Service.DTO
+namespace BDNAT_Repository.DTO
 {
-    public class TestKitDTO
+    public class ServiceTypeDTO
     {
-        public int TestKitId { get; set; }
+        public int ServiceTypeId { get; set; }
 
         public string? Name { get; set; }
 
@@ -16,8 +16,6 @@ namespace BDNAT_Service.DTO
 
         public decimal? Price { get; set; }
 
-        public string? IncludeItems { get; set; }
-
-        public bool? IsActive { get; set; }
+        public int? ServiceId { get; set; }
     }
 }

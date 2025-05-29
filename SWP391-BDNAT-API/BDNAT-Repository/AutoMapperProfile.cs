@@ -1,8 +1,15 @@
 ﻿using AutoMapper;
+using BDNAT_Repository.DTO;
+using BDNAT_Repository.DTO.Auth;
 using BDNAT_Repository.Entities;
-using BDNAT_Service.DTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace BDNAT_Helper
+namespace BDNAT_Repository
 {
     public class AutoMapperProfile : Profile
     {
@@ -26,7 +33,7 @@ namespace BDNAT_Helper
             CreateMap<TestParameter, TestParameterDTO>().ReverseMap();
             CreateMap<Transaction, TransactionDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<User, RegisterRequest>().ReverseMap();
         }
     }
-
 }

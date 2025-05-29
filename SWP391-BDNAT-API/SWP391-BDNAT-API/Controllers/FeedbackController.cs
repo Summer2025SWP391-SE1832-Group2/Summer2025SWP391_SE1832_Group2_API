@@ -1,4 +1,4 @@
-using BDNAT_Service.DTO;
+using BDNAT_Repository.DTO;
 using BDNAT_Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 

@@ -13,7 +13,5 @@ public partial class Service
 
     public int? DurationDays { get; set; }
 
-    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
-
     public virtual ICollection<ServiceType> ServiceTypes { get; set; } = new List<ServiceType>();
 }

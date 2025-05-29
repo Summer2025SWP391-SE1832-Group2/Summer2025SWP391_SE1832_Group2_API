@@ -32,4 +32,12 @@ public partial class User
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
+
+    public virtual ICollection<SampleCollectionSchedule> SampleCollectionSchedules { get; set; } = new List<SampleCollectionSchedule>();
+
+    public virtual ICollection<SampleShipment> SampleShipments { get; set; } = new List<SampleShipment>();
+
+    public virtual ICollection<Sample> Samples { get; set; } = new List<Sample>();
+
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

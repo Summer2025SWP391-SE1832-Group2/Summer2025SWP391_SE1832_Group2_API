@@ -10,5 +10,18 @@ namespace BDNAT_Repository.Implementation
 {
     public class TestParameterRepo : GenericRepository<TestParameter>, ITestParameterRepo
     {
+        private static TestParameterRepo _instance;
+
+        public static TestParameterRepo Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new TestParameterRepo();
+                }
+                return _instance;
+            }
+        }
     }
 }

@@ -10,5 +10,18 @@ namespace BDNAT_Repository.Implementation
 {
     public class FeedbackRepo : GenericRepository<Feedback>, IFeedbackRepo
     {
+        private static FeedbackRepo _instance;
+
+        public static FeedbackRepo Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new FeedbackRepo();
+                }
+                return _instance;
+            }
+        }
     }
 }
