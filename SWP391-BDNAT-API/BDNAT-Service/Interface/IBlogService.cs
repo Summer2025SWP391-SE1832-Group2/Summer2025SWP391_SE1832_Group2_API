@@ -10,6 +10,9 @@ namespace BDNAT_Service.Interface
     public interface IBlogService
     {
         Task<List<BlogDTO>> GetAllBlogsAsync();
+
+        Task<List<BlogDTO>> GetBlogsByBlogTypeIdAsync(int BlogTypeId);
+
         Task<BlogDTO> GetBlogByIdAsync(int id);
         Task<bool> CreateBlogAsync(BlogDTO blog);
         Task<bool> UpdateBlogAsync(BlogDTO blog);

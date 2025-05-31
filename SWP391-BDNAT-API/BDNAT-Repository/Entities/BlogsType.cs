@@ -7,7 +7,11 @@ public partial class BlogsType
 {
     public int BlogTypeId { get; set; }
 
+    public string? Title { get; set; }
+
     public string? Description { get; set; }
+
+    public string? Img { get; set; }
 
     public virtual ICollection<Blog> Blogs { get; set; } = new List<Blog>();
 }

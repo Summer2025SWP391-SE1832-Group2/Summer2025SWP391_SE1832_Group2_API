@@ -42,6 +42,14 @@ namespace BDNAT_Service.Implementation
             return _mapper.Map<BlogDTO>(await BlogRepo.Instance.GetByIdAsync(id));
         }
 
+        public async Task<List<BlogDTO>> GetBlogsByBlogTypeIdAsync(int BlogTypeId)
+        {
+            var BlogList = await BlogRepo.Instance.GetAllAsync();
+            BlogList = BlogList.Where(x => x.BlogTypeId == BlogTypeId).ToList();
+            return BlogList.Select(log => _mapper.Map<BlogDTO>(log)).ToList();
+        }
+
+
         public async Task<bool> UpdateBlogAsync(BlogDTO blog)
         {
             var mapBlog = _mapper.Map<Blog>(blog);

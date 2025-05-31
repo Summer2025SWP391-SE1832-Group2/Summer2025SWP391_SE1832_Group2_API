@@ -18,5 +18,11 @@ namespace BDNAT_Repository.DTO
         public string? Content { get; set; }
 
         public int? BlogTypeId { get; set; }
+
+        public DateTime? CreateAt { get; set; }
+
+        public DateTime? UpdateAt { get; set; }
+
+        public string? Image { get; set; }
     }
 }

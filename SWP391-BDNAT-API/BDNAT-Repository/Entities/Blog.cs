@@ -15,6 +15,12 @@ public partial class Blog
 
     public int? BlogTypeId { get; set; }
 
+    public DateTime? CreateAt { get; set; }
+
+    public DateTime? UpdateAt { get; set; }
+
+    public string? Image { get; set; }
+
     public virtual BlogsType? BlogType { get; set; }
 
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();

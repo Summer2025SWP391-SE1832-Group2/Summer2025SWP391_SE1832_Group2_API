@@ -65,7 +65,10 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.BlogId).HasColumnName("BlogID");
             entity.Property(e => e.BlogTypeId).HasColumnName("BlogTypeID");
+            entity.Property(e => e.CreateAt).HasColumnType("date");
+            entity.Property(e => e.Image).HasMaxLength(255);
             entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.UpdateAt).HasColumnType("date");
 
             entity.HasOne(d => d.BlogType).WithMany(p => p.Blogs)
                 .HasForeignKey(d => d.BlogTypeId)
@@ -84,6 +87,7 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.BlogTypeId).HasColumnName("BlogTypeID");
             entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.Title).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Booking>(entity =>

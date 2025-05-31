@@ -89,5 +89,21 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("type/{blogTypeId}")]
+        public async Task<ActionResult<List<BlogDTO>>> GetBlogByBlogTypeId(int blogTypeId)
+        {
+            try
+            {
+                var blogs = await _blogService.GetBlogsByBlogTypeIdAsync(blogTypeId);
+                if (blogs == null || !blogs.Any())
+                    return NotFound($"No blogs found for blog type ID {blogTypeId}");
+                return Ok(blogs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
