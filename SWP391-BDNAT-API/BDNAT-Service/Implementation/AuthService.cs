@@ -29,7 +29,7 @@ namespace BDNAT_Service.Implementation
 
         public async Task<Token> LoginAsync(LoginRequest request)
         {
-            var user = await UserRepo.Instance.getUserbyEmail(request.Username);
+            var user = await UserRepo.Instance.getUserbyEmail(request.Email);
             if (user != null)
             {
                 // Hash the input password with MD5
@@ -120,7 +120,7 @@ namespace BDNAT_Service.Implementation
                     ExpireAt = DateTime.UtcNow.AddMinutes(10)
                 };
 
-                await _emailService.SendEmailAsync(request.Email, "Verify your User", code, request.Username);
+                await _emailService.SendEmailAsync(request.Email, "Verify your User", code, request.FullName);
 
                 return "Verification code has sent to email.";
             }
@@ -169,7 +169,7 @@ namespace BDNAT_Service.Implementation
                     ExpireAt = DateTime.UtcNow.AddMinutes(10)
                 };
 
-                await _emailService.SendEmailAsync(request.Email, "Verify your User", code, request.Username);
+                await _emailService.SendEmailAsync(request.Email, "Verify your User", code, request.FullName);
 
                 return "Verification code has sent to email.";
             }
