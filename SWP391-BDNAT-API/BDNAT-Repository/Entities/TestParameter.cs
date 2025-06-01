@@ -16,6 +16,4 @@ public partial class TestParameter
     public virtual Parameter? Parameter { get; set; }
 
     public virtual ICollection<ResultDetail> ResultDetails { get; set; } = new List<ResultDetail>();
-
-    public virtual ServiceType? ServiceType { get; set; }
 }

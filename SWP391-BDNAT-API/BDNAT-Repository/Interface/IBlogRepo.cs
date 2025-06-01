@@ -9,5 +9,6 @@ namespace BDNAT_Repository.Interface
 {
     public interface IBlogRepo : IGenericRepository<Blog>
     {
+        Task<List<Blog>> GetBlogsByBlogTypeIdAsync(int blogTypeId);
     }
 }

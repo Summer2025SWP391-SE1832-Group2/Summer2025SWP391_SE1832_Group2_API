@@ -7,7 +7,7 @@ public partial class Booking
 {
     public int BookingId { get; set; }
 
-    public int ServiceTypeId { get; set; }
+    public int ServiceId { get; set; }
 
     public int UserId { get; set; }
 
@@ -37,7 +37,7 @@ public partial class Booking
 
     public virtual ICollection<Sample> Samples { get; set; } = new List<Sample>();
 
-    public virtual ServiceType ServiceType { get; set; } = null!;
+    public virtual Service Service { get; set; } = null!;
 
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 

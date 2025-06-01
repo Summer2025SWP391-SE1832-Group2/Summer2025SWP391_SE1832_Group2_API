@@ -15,5 +15,9 @@ namespace BDNAT_Repository.DTO
         public string? Description { get; set; }
 
         public int? DurationDays { get; set; }
+
+        public decimal? Price { get; set; }
+
+        public int? ServiceTypeId { get; set; }
     }
 }

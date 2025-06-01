@@ -11,13 +11,5 @@ public partial class ServiceType
 
     public string? Description { get; set; }
 
-    public decimal? Price { get; set; }
-
-    public int? ServiceId { get; set; }
-
-    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
-
-    public virtual Service? Service { get; set; }
-
-    public virtual ICollection<TestParameter> TestParameters { get; set; } = new List<TestParameter>();
+    public virtual ICollection<Service> Services { get; set; } = new List<Service>();
 }

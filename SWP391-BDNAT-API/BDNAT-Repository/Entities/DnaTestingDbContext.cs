@@ -23,6 +23,8 @@ public partial class DnaTestingDbContext : DbContext
 
     public virtual DbSet<Comment> Comments { get; set; }
 
+    public virtual DbSet<DoctorTeam> DoctorTeams { get; set; }
+
     public virtual DbSet<Favorite> Favorites { get; set; }
 
     public virtual DbSet<Feedback> Feedbacks { get; set; }
@@ -44,6 +46,14 @@ public partial class DnaTestingDbContext : DbContext
     public virtual DbSet<Service> Services { get; set; }
 
     public virtual DbSet<ServiceType> ServiceTypes { get; set; }
+
+    public virtual DbSet<Team> Teams { get; set; }
+
+    public virtual DbSet<TeamService> TeamServices { get; set; }
+
+    public virtual DbSet<Technical> Technicals { get; set; }
+
+    public virtual DbSet<TechnicalService> TechnicalServices { get; set; }
 
     public virtual DbSet<TestKit> TestKits { get; set; }
 
@@ -101,14 +111,14 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.PaymentStatus).HasMaxLength(50);
             entity.Property(e => e.PreferredDate).HasColumnType("date");
             entity.Property(e => e.SampleMethod).HasMaxLength(100);
-            entity.Property(e => e.ServiceTypeId).HasColumnName("ServiceTypeID");
+            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
             entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.UserId).HasColumnName("UserID");
 
-            entity.HasOne(d => d.ServiceType).WithMany(p => p.Bookings)
-                .HasForeignKey(d => d.ServiceTypeId)
+            entity.HasOne(d => d.Service).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.ServiceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Booking__Service__5535A963");
+                .HasConstraintName("FK_Booking_Service");
 
             entity.HasOne(d => d.User).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.UserId)
@@ -139,6 +149,23 @@ public partial class DnaTestingDbContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Comments__UserID__4222D4EF");
+        });
+
+        modelBuilder.Entity<DoctorTeam>(entity =>
+        {
+            entity.ToTable("DoctorTeam");
+
+            entity.Property(e => e.DoctorTeamId).HasColumnName("DoctorTeamID");
+            entity.Property(e => e.TeamId).HasColumnName("TeamID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.Team).WithMany(p => p.DoctorTeams)
+                .HasForeignKey(d => d.TeamId)
+                .HasConstraintName("FK_DoctorTeam_Team");
+
+            entity.HasOne(d => d.User).WithMany(p => p.DoctorTeams)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_DoctorTeam_Users");
         });
 
         modelBuilder.Entity<Favorite>(entity =>
@@ -334,6 +361,12 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
             entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.ServiceTypeId).HasColumnName("ServiceTypeID");
+
+            entity.HasOne(d => d.ServiceType).WithMany(p => p.Services)
+                .HasForeignKey(d => d.ServiceTypeId)
+                .HasConstraintName("FK_Service_ServiceType");
         });
 
         modelBuilder.Entity<ServiceType>(entity =>
@@ -344,12 +377,61 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.ServiceTypeId).HasColumnName("ServiceTypeID");
             entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
-            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
+        });
 
-            entity.HasOne(d => d.Service).WithMany(p => p.ServiceTypes)
+        modelBuilder.Entity<Team>(entity =>
+        {
+            entity.ToTable("Team");
+
+            entity.Property(e => e.TeamId).HasColumnName("TeamID");
+            entity.Property(e => e.Description).HasMaxLength(100);
+            entity.Property(e => e.Title).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<TeamService>(entity =>
+        {
+            entity.ToTable("Team_Service");
+
+            entity.Property(e => e.TeamServiceId).HasColumnName("TeamServiceID");
+            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
+            entity.Property(e => e.TeamId).HasColumnName("TeamID");
+
+            entity.HasOne(d => d.Service).WithMany(p => p.TeamServices)
                 .HasForeignKey(d => d.ServiceId)
-                .HasConstraintName("FK__ServiceTy__Servi__48CFD27E");
+                .HasConstraintName("FK_Team_Service_Service");
+
+            entity.HasOne(d => d.Team).WithMany(p => p.TeamServices)
+                .HasForeignKey(d => d.TeamId)
+                .HasConstraintName("FK_Team_Service_Team");
+        });
+
+        modelBuilder.Entity<Technical>(entity =>
+        {
+            entity.ToTable("Technical");
+
+            entity.Property(e => e.TechnicalId).HasColumnName("TechnicalID");
+            entity.Property(e => e.Img).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<TechnicalService>(entity =>
+        {
+            entity.HasKey(e => e.TechServiceId);
+
+            entity.ToTable("Technical_Service");
+
+            entity.Property(e => e.TechServiceId).HasColumnName("TechServiceID");
+            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
+            entity.Property(e => e.TechnicalId).HasColumnName("TechnicalID");
+
+            entity.HasOne(d => d.Service).WithMany(p => p.TechnicalServices)
+                .HasForeignKey(d => d.ServiceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Technical_Service_Service");
+
+            entity.HasOne(d => d.Technical).WithMany(p => p.TechnicalServices)
+                .HasForeignKey(d => d.TechnicalId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Technical_Service_Technical");
         });
 
         modelBuilder.Entity<TestKit>(entity =>
@@ -374,10 +456,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.HasOne(d => d.Parameter).WithMany(p => p.TestParameters)
                 .HasForeignKey(d => d.ParameterId)
                 .HasConstraintName("FK_TestParameter_Parameter");
-
-            entity.HasOne(d => d.ServiceType).WithMany(p => p.TestParameters)
-                .HasForeignKey(d => d.ServiceTypeId)
-                .HasConstraintName("FK_TestParameter_ServiceType");
         });
 
         modelBuilder.Entity<Transaction>(entity =>
