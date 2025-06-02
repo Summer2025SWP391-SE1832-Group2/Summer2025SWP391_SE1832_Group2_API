@@ -63,6 +63,8 @@ public partial class DnaTestingDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=(local);Database= DNA_Testing_db;Uid=sa;Pwd=admin12345;TrustServerCertificate=True;");
@@ -490,6 +492,25 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
             entity.Property(e => e.Phone).HasMaxLength(20);
             entity.Property(e => e.Role).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<WorkSchedule>(entity =>
+        {
+            entity.Property(e => e.WorkScheduleId)
+                .ValueGeneratedNever()
+                .HasColumnName("WorkScheduleID");
+            entity.Property(e => e.CreateAt).HasColumnType("date");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.EndTime).HasColumnType("date");
+            entity.Property(e => e.StartTime).HasColumnType("date");
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.UpdateAt).HasColumnType("date");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.WorkSchedules)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_WorkSchedules_Users");
         });
 
         OnModelCreatingPartial(modelBuilder);
