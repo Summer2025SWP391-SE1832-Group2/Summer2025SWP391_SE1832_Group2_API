@@ -1,6 +1,10 @@
 using BDNAT_Repository;
+using BDNAT_Repository.Entities;
 using BDNAT_Service.Implementation;
 using BDNAT_Service.Interface;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,11 +42,29 @@ builder.Services.AddCors(options =>
     {
         policy
             .SetIsOriginAllowed(_ => true) // Replace with actual frontend URL
-            .AllowAnyHeader()
-            .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
             .AllowCredentials();
     });
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "YourIssuer",
+            ValidAudience = "YourAudience",
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("c2VydmVwZXJmZWN0bHljaGVlc2VxdWlja2NvYWNoY29sbGVjdHNsb3Bld2lzZWNhbWU="))
+        };
+    });
+
+
 
 var app = builder.Build();
 
@@ -56,6 +78,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
