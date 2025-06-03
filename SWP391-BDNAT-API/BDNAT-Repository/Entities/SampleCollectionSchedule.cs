@@ -13,9 +13,9 @@ public partial class SampleCollectionSchedule
 
     public DateTime CollectionDate { get; set; }
 
-    public string Location { get; set; } = null!;
+    public string? Time { get; set; }
 
-    public bool? CollectedByUser { get; set; }
+    public string Location { get; set; } = null!;
 
     public string? Status { get; set; }
 

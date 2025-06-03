@@ -21,6 +21,8 @@ public partial class User
 
     public DateTime? DateOfBirth { get; set; }
 
+    public string? IdentityNumber { get; set; }
+
     public virtual ICollection<Blog> Blogs { get; set; } = new List<Blog>();
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
@@ -43,5 +45,5 @@ public partial class User
 
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
-    public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new List<WorkSchedule>();
+    public virtual ICollection<UserWorkSchedule> UserWorkSchedules { get; set; } = new List<UserWorkSchedule>();
 }
