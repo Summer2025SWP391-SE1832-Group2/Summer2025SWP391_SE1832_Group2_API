@@ -23,7 +23,7 @@ public partial class Booking
 
     public bool BuyKit { get; set; }
 
-    public bool SamplePickup { get; set; }
+    public bool Method { get; set; }
 
     public virtual ICollection<KitOrder> KitOrders { get; set; } = new List<KitOrder>();
 

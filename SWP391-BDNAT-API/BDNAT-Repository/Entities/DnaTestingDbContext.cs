@@ -63,11 +63,13 @@ public partial class DnaTestingDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserWorkSchedule> UserWorkSchedules { get; set; }
+
     public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=(local);Database= DNA_Testing_db;Uid=sa;Pwd=admin12345;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=(local);Database= DNA_Testing_db;Uid=sa;Pwd=12345;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -320,6 +322,7 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(10)
                 .IsFixedLength();
+            entity.Property(e => e.Time).HasMaxLength(50);
 
             entity.HasOne(d => d.Booking).WithMany(p => p.SampleCollectionSchedules)
                 .HasForeignKey(d => d.BookingId)
@@ -453,11 +456,15 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.TestParameterId).HasColumnName("TestParameterID");
             entity.Property(e => e.ParameterId).HasColumnName("ParameterID");
-            entity.Property(e => e.ServiceTypeId).HasColumnName("ServiceTypeID");
+            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
 
             entity.HasOne(d => d.Parameter).WithMany(p => p.TestParameters)
                 .HasForeignKey(d => d.ParameterId)
                 .HasConstraintName("FK_TestParameter_Parameter");
+
+            entity.HasOne(d => d.Service).WithMany(p => p.TestParameters)
+                .HasForeignKey(d => d.ServiceId)
+                .HasConstraintName("FK_TestParameter_Service");
         });
 
         modelBuilder.Entity<Transaction>(entity =>
@@ -489,28 +496,39 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.Gender).HasMaxLength(10);
+            entity.Property(e => e.IdentityNumber).HasMaxLength(15);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
             entity.Property(e => e.Phone).HasMaxLength(20);
             entity.Property(e => e.Role).HasMaxLength(50);
         });
 
+        modelBuilder.Entity<UserWorkSchedule>(entity =>
+        {
+            entity.ToTable("User_WorkSchedule");
+
+            entity.Property(e => e.UserWorkScheduleId).HasColumnName("UserWorkScheduleID");
+            entity.Property(e => e.Date).HasColumnType("datetime");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.WorkScheduleId).HasColumnName("WorkScheduleID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserWorkSchedules)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_User_WorkSchedule_Users");
+
+            entity.HasOne(d => d.WorkSchedule).WithMany(p => p.UserWorkSchedules)
+                .HasForeignKey(d => d.WorkScheduleId)
+                .HasConstraintName("FK_User_WorkSchedule_WorkSchedules");
+        });
+
         modelBuilder.Entity<WorkSchedule>(entity =>
         {
-            entity.Property(e => e.WorkScheduleId)
-                .ValueGeneratedNever()
-                .HasColumnName("WorkScheduleID");
+            entity.Property(e => e.WorkScheduleId).HasColumnName("WorkScheduleID");
             entity.Property(e => e.CreateAt).HasColumnType("date");
             entity.Property(e => e.Description).HasMaxLength(200);
             entity.Property(e => e.EndTime).HasColumnType("date");
             entity.Property(e => e.StartTime).HasColumnType("date");
             entity.Property(e => e.Title).HasMaxLength(200);
             entity.Property(e => e.UpdateAt).HasColumnType("date");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
-
-            entity.HasOne(d => d.User).WithMany(p => p.WorkSchedules)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_WorkSchedules_Users");
         });
 
         OnModelCreatingPartial(modelBuilder);

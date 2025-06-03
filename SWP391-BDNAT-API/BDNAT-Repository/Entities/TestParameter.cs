@@ -7,7 +7,7 @@ public partial class TestParameter
 {
     public int TestParameterId { get; set; }
 
-    public int? ServiceTypeId { get; set; }
+    public int? ServiceId { get; set; }
 
     public int? ParameterId { get; set; }
 
@@ -16,4 +16,6 @@ public partial class TestParameter
     public virtual Parameter? Parameter { get; set; }
 
     public virtual ICollection<ResultDetail> ResultDetails { get; set; } = new List<ResultDetail>();
+
+    public virtual Service? Service { get; set; }
 }

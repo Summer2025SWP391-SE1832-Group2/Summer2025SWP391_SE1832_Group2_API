@@ -7,8 +7,6 @@ public partial class WorkSchedule
 {
     public int WorkScheduleId { get; set; }
 
-    public int UserId { get; set; }
-
     public string? Title { get; set; }
 
     public string? Description { get; set; }
@@ -21,5 +19,5 @@ public partial class WorkSchedule
 
     public DateTime? UpdateAt { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public virtual ICollection<UserWorkSchedule> UserWorkSchedules { get; set; } = new List<UserWorkSchedule>();
 }
