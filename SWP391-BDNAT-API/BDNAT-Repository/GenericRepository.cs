@@ -128,6 +128,12 @@ namespace BDNAT_Repository
 
                 return await _context.SaveChangesAsync() > 0;
             }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                Console.WriteLine("Concurrency conflict: " + ex.Message);
+                // Có thể log hoặc xử lý phù hợp (reload, báo lỗi, etc.)
+                return false;
+            }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
