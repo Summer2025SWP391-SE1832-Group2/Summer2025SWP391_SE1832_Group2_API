@@ -9,5 +9,8 @@ namespace BDNAT_Repository.Interface
 {
     public interface ISampleCollectionScheduleRepo : IGenericRepository<SampleCollectionSchedule>
     {
+    
+        Task<SampleCollectionSchedule> GetScheduleByBookingIdAsync(int bookingId);
+        Task<List<SampleCollectionSchedule>> GetSchedulesByCollectorIdAsync(int collectorId);
     }
-}
+} 

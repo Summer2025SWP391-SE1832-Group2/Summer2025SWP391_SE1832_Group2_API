@@ -1,10 +1,12 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BDNAT_Repository.DTO;
 using BDNAT_Repository.Entities;
 using BDNAT_Repository.Implementation;
 using BDNAT_Service.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BDNAT_Service.Implementation
@@ -18,31 +20,53 @@ namespace BDNAT_Service.Implementation
             _mapper = mapper;
         }
 
-        public async Task<List<SampleCollectionScheduleDTO>> GetAllSampleCollectionScheduleAsync()
+        public async Task<List<SampleCollectionScheduleDTO>> GetAllSchedulesAsync()
         {
-            var list = await SampleCollectionScheduleRepo.Instance.GetAllAsync();
-            return list.Select(x => _mapper.Map<SampleCollectionScheduleDTO>(x)).ToList();
+            var schedules = await SampleCollectionScheduleRepo.Instance.GetAllAsync();
+            return schedules.Select(s => _mapper.Map<SampleCollectionScheduleDTO>(s)).ToList();
         }
 
-        public async Task<SampleCollectionScheduleDTO> GetSampleCollectionScheduleByIdAsync(int id)
+        public async Task<SampleCollectionScheduleDTO> GetScheduleByIdAsync(int id)
         {
-            var entity = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(id);
-            return _mapper.Map<SampleCollectionScheduleDTO>(entity);
+            var schedule = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(id);
+            return _mapper.Map<SampleCollectionScheduleDTO>(schedule);
         }
 
-        public async Task<bool> CreateSampleCollectionScheduleAsync(SampleCollectionScheduleDTO schedule)
+        public async Task<SampleCollectionScheduleDTO> GetScheduleByBookingIdAsync(int bookingId)
         {
-            var entity = _mapper.Map<SampleCollectionSchedule>(schedule);
-            return await SampleCollectionScheduleRepo.Instance.InsertAsync(entity);
+            var schedule = await SampleCollectionScheduleRepo.Instance.GetScheduleByBookingIdAsync(bookingId);
+            return _mapper.Map<SampleCollectionScheduleDTO>(schedule);
         }
 
-        public async Task<bool> UpdateSampleCollectionScheduleAsync(SampleCollectionScheduleDTO schedule)
+        public async Task<List<SampleCollectionScheduleDTO>> GetSchedulesByCollectorIdAsync(int collectorId)
         {
-            var entity = _mapper.Map<SampleCollectionSchedule>(schedule);
-            return await SampleCollectionScheduleRepo.Instance.UpdateAsync(entity);
+            var schedules = await SampleCollectionScheduleRepo.Instance.GetSchedulesByCollectorIdAsync(collectorId);
+            return schedules.Select(s => _mapper.Map<SampleCollectionScheduleDTO>(s)).ToList();
         }
 
-        public async Task<bool> DeleteSampleCollectionScheduleAsync(int id)
+        public async Task<bool> CreateScheduleAsync(SampleCollectionScheduleDTO schedule)
+        {
+            var mapSchedule = _mapper.Map<SampleCollectionSchedule>(schedule);
+            return await SampleCollectionScheduleRepo.Instance.InsertAsync(mapSchedule);
+        }
+
+        public async Task<bool> UpdateScheduleAsync(SampleCollectionScheduleDTO schedule)
+        {
+            var mapSchedule = _mapper.Map<SampleCollectionSchedule>(schedule);
+            return await SampleCollectionScheduleRepo.Instance.UpdateAsync(mapSchedule);
+        }
+
+        public async Task<bool> UpdateScheduleAssignTaskAsync(int id, int idStaff)
+        {
+            var schedule = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(id);
+            if (schedule == null)
+                return false;
+
+            schedule.CollectorId = idStaff;
+            return await SampleCollectionScheduleRepo.Instance.UpdateAsync(schedule);
+        }
+
+        public async Task<bool> DeleteScheduleAsync(int id)
         {
             return await SampleCollectionScheduleRepo.Instance.DeleteAsync(id);
         }
@@ -89,5 +113,15 @@ namespace BDNAT_Service.Implementation
             var mapped = _mapper.Map<List<UserDTO>>(availableStaff);
             return mapped;
         }
+    
+        public async Task<bool> UpdateScheduleStatusAsync(int id, string status)
+        {
+            var schedule = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(id);
+            if (schedule == null)
+                return false;
+
+            schedule.Status = status;
+            return await SampleCollectionScheduleRepo.Instance.UpdateAsync(schedule);
+        }
     }
-}
+} 

@@ -1,5 +1,6 @@
-﻿using BDNAT_Repository.Entities;
+using BDNAT_Repository.Entities;
 using BDNAT_Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,5 +31,27 @@ namespace BDNAT_Repository.Implementation
             var result = allSchedules.Where(s => s.CollectorId == null).ToList();
             return result;
         }
+   
+        public async Task<SampleCollectionSchedule> GetScheduleByBookingIdAsync(int bookingId)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                return await context.SampleCollectionSchedules
+                    .Include(s => s.Booking)
+                    .Include(s => s.Collector)
+                    .FirstOrDefaultAsync(s => s.BookingId == bookingId);
+            }
+        }
+
+        public async Task<List<SampleCollectionSchedule>> GetSchedulesByCollectorIdAsync(int collectorId)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                return await context.SampleCollectionSchedules
+                    .Include(s => s.Booking)
+                    .Where(s => s.CollectorId == collectorId)
+                    .ToListAsync();
+            }
+        }
     }
-}
+} 
