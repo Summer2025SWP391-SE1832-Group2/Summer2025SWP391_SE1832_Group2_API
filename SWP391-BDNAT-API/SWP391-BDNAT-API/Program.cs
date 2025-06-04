@@ -1,3 +1,4 @@
+using BDNAT_Helper.payOS;
 using BDNAT_Repository;
 using BDNAT_Repository.Entities;
 using BDNAT_Service.Implementation;
@@ -16,6 +17,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+builder.Services.AddSingleton(x =>
+    new PayOSService(
+        builder.Configuration["payOS:clientId"],
+        builder.Configuration["payOS:apiKey"],
+        builder.Configuration["payOS:checksumKey"]
+    )
+);
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IBlogsTypeService, BlogsTypeService>();
@@ -36,6 +44,10 @@ builder.Services.AddScoped<ITestParameterService, TestParameterService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ISampleCollectionScheduleService, SampleCollectionScheduleService>();
+builder.Services.AddScoped<IPayOSService, PayOSServiceImple>();
+
+
 
 builder.Services.AddCors(options =>
 {

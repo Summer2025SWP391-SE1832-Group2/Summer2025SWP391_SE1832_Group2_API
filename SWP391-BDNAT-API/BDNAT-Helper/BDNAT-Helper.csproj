@@ -9,11 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="payOS" Version="1.0.9" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BDNAT-Repository\BDNAT-Repository.csproj" />
-    <ProjectReference Include="..\BDNAT-Service\BDNAT-Service.csproj" />
   </ItemGroup>
 
 </Project>

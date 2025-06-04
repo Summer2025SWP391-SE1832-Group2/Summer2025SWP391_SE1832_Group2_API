@@ -13,9 +13,23 @@ public partial class Transaction
 
     public decimal? Price { get; set; }
 
-    public int? DurationDays { get; set; }
-
     public int? UserId { get; set; }
+
+    public string OrderCode { get; set; } = null!;
+
+    public string? TransactionCode { get; set; }
+
+    public string PaymentGateway { get; set; } = null!;
+
+    public string Status { get; set; } = null!;
+
+    public string? PaymentMethod { get; set; }
+
+    public string? PaymentUrl { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
 
     public virtual Booking? Booking { get; set; }
 

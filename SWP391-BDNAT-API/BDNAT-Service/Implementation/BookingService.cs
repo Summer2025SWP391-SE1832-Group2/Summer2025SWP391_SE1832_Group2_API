@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using BDNAT_Helper.payOS;
 
 namespace BDNAT_Service.Implementation
 {
@@ -15,16 +17,45 @@ namespace BDNAT_Service.Implementation
     {
         private readonly IMapper _mapper;
 
-        public BookingService(IMapper mapper)
+        private readonly IPayOSService _payOSService;
+
+        public BookingService(IMapper mapper, IPayOSService payOSService)
         {
             _mapper = mapper;
+            _payOSService = payOSService;
         }
 
-        public async Task<bool> CreateBookingAsync(BookingDTO booking)
+        public async Task<string?> CreateBookingAsync(BookingDTO bookingDto)
         {
-            var map = _mapper.Map<Booking>(booking);
-            return await BookingRepo.Instance.InsertAsync(map);
+            var booking = _mapper.Map<Booking>(bookingDto);
+
+            // Insert booking
+            var bookingCreated = await BookingRepo.Instance.InsertAsync(booking);
+            if (!bookingCreated)
+                return null;
+
+            // Insert schedule
+            var schedule = new SampleCollectionSchedule
+            {
+                BookingId = booking.BookingId,
+                CollectionDate = bookingDto.PreferredDate ?? DateTime.Now,
+                Time = bookingDto.Time,
+                Location = bookingDto.Location,
+                Status = "Pending"
+            };
+
+            var scheduleCreated = await SampleCollectionScheduleRepo.Instance.InsertAsync(schedule);
+            if (!scheduleCreated)
+                return null;
+            var service = await ServiceRepo.Instance.GetByIdAsync(bookingDto.ServiceId);
+            // Gọi dịch vụ tạo link thanh toán
+            var amount = service.Price ?? 0; // Bạn cần thêm Amount vào DTO nếu chưa có
+            var paymentUrl = await _payOSService.RequestWithPayOsAsync(booking, amount);
+
+            return paymentUrl;
         }
+
+
 
         public async Task<bool> DeleteBookingAsync(int id)
         {

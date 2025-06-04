@@ -13,8 +13,6 @@ public partial class Booking
 
     public DateTime BookingDate { get; set; }
 
-    public string SampleMethod { get; set; } = null!;
-
     public string Status { get; set; } = null!;
 
     public string PaymentStatus { get; set; } = null!;

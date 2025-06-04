@@ -19,5 +19,9 @@ namespace BDNAT_Repository.DTO
         public decimal? Price { get; set; }
 
         public int? ServiceTypeId { get; set; }
+
+        public bool? IsAtHome { get; set; }
+
+        public bool? IsStaffSuport { get; set; }
     }
 }

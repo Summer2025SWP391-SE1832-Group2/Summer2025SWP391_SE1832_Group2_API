@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BDNAT-Helper\BDNAT-Helper.csproj" />
     <ProjectReference Include="..\BDNAT-Repository\BDNAT-Repository.csproj" />
   </ItemGroup>
 

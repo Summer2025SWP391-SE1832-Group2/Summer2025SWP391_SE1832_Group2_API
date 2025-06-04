@@ -69,7 +69,7 @@ public partial class DnaTestingDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=(local);Database= DNA_Testing_db;Uid=sa;Pwd=12345;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=(local);Database= DNA_Testing_db;Uid=sa;Pwd=admin12345;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -114,7 +114,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.BookingDate).HasColumnType("date");
             entity.Property(e => e.PaymentStatus).HasMaxLength(50);
             entity.Property(e => e.PreferredDate).HasColumnType("date");
-            entity.Property(e => e.SampleMethod).HasMaxLength(100);
             entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
             entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.UserId).HasColumnName("UserID");
@@ -312,9 +311,7 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.ToTable("SampleCollectionSchedule");
 
-            entity.Property(e => e.ScheduleId)
-                .ValueGeneratedNever()
-                .HasColumnName("ScheduleID");
+            entity.Property(e => e.ScheduleId).HasColumnName("ScheduleID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.CollectionDate).HasColumnType("date");
             entity.Property(e => e.CollectorId).HasColumnName("CollectorID");
@@ -475,7 +472,33 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.TransactionId).HasColumnName("TransactionID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.OrderCode)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.PaymentGateway)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValueSql("('PAYOS')");
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.PaymentUrl)
+                .HasMaxLength(500)
+                .IsUnicode(false);
             entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValueSql("('PENDING')");
+            entity.Property(e => e.TransactionCode)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.UserId).HasColumnName("UserID");
 
             entity.HasOne(d => d.Booking).WithMany(p => p.Transactions)
@@ -525,8 +548,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.WorkScheduleId).HasColumnName("WorkScheduleID");
             entity.Property(e => e.CreateAt).HasColumnType("date");
             entity.Property(e => e.Description).HasMaxLength(200);
-            entity.Property(e => e.EndTime).HasColumnType("date");
-            entity.Property(e => e.StartTime).HasColumnType("date");
             entity.Property(e => e.Title).HasMaxLength(200);
             entity.Property(e => e.UpdateAt).HasColumnType("date");
         });

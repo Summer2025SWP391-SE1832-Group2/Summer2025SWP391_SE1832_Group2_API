@@ -54,7 +54,7 @@ namespace SWP391_BDNAT_API.Controllers
                     return BadRequest(ModelState);
 
                 var result = await _bookingService.CreateBookingAsync(dto);
-                return Ok(result);
+                return Created("Create Booking Successfully!", result);
             }
             catch (Exception ex)
             {
