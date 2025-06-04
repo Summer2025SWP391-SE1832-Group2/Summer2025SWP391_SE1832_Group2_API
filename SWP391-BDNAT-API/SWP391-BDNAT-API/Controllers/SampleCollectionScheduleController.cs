@@ -11,11 +11,11 @@ namespace SWP391_BDNAT_API.Controllers
     [ApiController]
     public class SampleCollectionScheduleController : ControllerBase
     {
-        private readonly ISampleCollectionScheduleService _service;
+        private readonly ISampleCollectionScheduleService _scheduleService;
 
-        public SampleCollectionScheduleController(ISampleCollectionScheduleService service)
+        public SampleCollectionScheduleController(ISampleCollectionScheduleService scheduleService)
         {
-            _service = service;
+            _scheduleService = scheduleService;
         }
 
         [HttpGet]
@@ -23,7 +23,7 @@ namespace SWP391_BDNAT_API.Controllers
         {
             try
             {
-                var list = await _service.GetAllSampleCollectionScheduleAsync();
+                var list = await _scheduleService.GetAllSampleCollectionScheduleAsync();
                 return Ok(list);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace SWP391_BDNAT_API.Controllers
         [HttpGet("{scheduleId}/available-staffs")]
         public async Task<IActionResult> GetAvailableStaffs(int scheduleId)
         {
-            var staffs = await _service.GetAvailableStaffForSchedule(scheduleId);
+            var staffs = await _scheduleService.GetAvailableStaffForSchedule(scheduleId);
             return Ok(staffs);
         }
 
@@ -44,7 +44,7 @@ namespace SWP391_BDNAT_API.Controllers
         {
             try
             {
-                var list = await _service.GetAllWhereCollectorIsNullAsync();
+                var list = await _scheduleService.GetAllWhereCollectorIsNullAsync();
                 return Ok(list);
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@ namespace SWP391_BDNAT_API.Controllers
         {
             try
             {
-                var schedule = await _scheduleService.GetScheduleByIdAsync(id);
+                var schedule = await _scheduleService.GetSampleCollectionScheduleByIdAsync(id);
                 if (schedule == null)
                     return NotFound($"Schedule with ID {id} not found");
                 return Ok(schedule);
@@ -107,7 +107,7 @@ namespace SWP391_BDNAT_API.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var result = await _service.CreateSampleCollectionScheduleAsync(dto);
+                var result = await _scheduleService.CreateSampleCollectionScheduleAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -121,7 +121,7 @@ namespace SWP391_BDNAT_API.Controllers
         {
             try
             {
-                var result = await _scheduleService.UpdateScheduleAsync(scheduleDto);
+                var result = await _scheduleService.UpdateSampleCollectionScheduleAsync(scheduleDto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -151,7 +151,7 @@ namespace SWP391_BDNAT_API.Controllers
         {
             try
             {
-                var result = await _scheduleService.DeleteScheduleAsync(id);
+                var result = await _scheduleService.DeleteSampleCollectionScheduleAsync(id);
                 return Ok(result);
             }
             catch (Exception ex)

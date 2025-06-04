@@ -20,13 +20,13 @@ namespace BDNAT_Service.Implementation
             _mapper = mapper;
         }
 
-        public async Task<List<SampleCollectionScheduleDTO>> GetAllSchedulesAsync()
+        public async Task<List<SampleCollectionScheduleDTO>> GetAllSampleCollectionScheduleAsync()
         {
             var schedules = await SampleCollectionScheduleRepo.Instance.GetAllAsync();
             return schedules.Select(s => _mapper.Map<SampleCollectionScheduleDTO>(s)).ToList();
         }
 
-        public async Task<SampleCollectionScheduleDTO> GetScheduleByIdAsync(int id)
+        public async Task<SampleCollectionScheduleDTO> GetSampleCollectionScheduleByIdAsync(int id)
         {
             var schedule = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(id);
             return _mapper.Map<SampleCollectionScheduleDTO>(schedule);
@@ -44,13 +44,13 @@ namespace BDNAT_Service.Implementation
             return schedules.Select(s => _mapper.Map<SampleCollectionScheduleDTO>(s)).ToList();
         }
 
-        public async Task<bool> CreateScheduleAsync(SampleCollectionScheduleDTO schedule)
+        public async Task<bool> CreateSampleCollectionScheduleAsync(SampleCollectionScheduleDTO schedule)
         {
             var mapSchedule = _mapper.Map<SampleCollectionSchedule>(schedule);
             return await SampleCollectionScheduleRepo.Instance.InsertAsync(mapSchedule);
         }
 
-        public async Task<bool> UpdateScheduleAsync(SampleCollectionScheduleDTO schedule)
+        public async Task<bool> UpdateSampleCollectionScheduleAsync(SampleCollectionScheduleDTO schedule)
         {
             var mapSchedule = _mapper.Map<SampleCollectionSchedule>(schedule);
             return await SampleCollectionScheduleRepo.Instance.UpdateAsync(mapSchedule);
@@ -66,7 +66,7 @@ namespace BDNAT_Service.Implementation
             return await SampleCollectionScheduleRepo.Instance.UpdateAsync(schedule);
         }
 
-        public async Task<bool> DeleteScheduleAsync(int id)
+        public async Task<bool> DeleteSampleCollectionScheduleAsync(int id)
         {
             return await SampleCollectionScheduleRepo.Instance.DeleteAsync(id);
         }
