@@ -18,6 +18,10 @@ namespace BDNAT_Repository
             CreateMap<Blog, BlogDTO>().ReverseMap();
             CreateMap<BlogsType, BlogsTypeDTO>().ReverseMap();
             CreateMap<Booking, BookingDTO>().ReverseMap();
+
+            CreateMap<Booking, BookingScheduleDTO>().ReverseMap();
+            CreateMap<SampleCollectionSchedule, SampleCollectionScheduleDTO>().ReverseMap();
+
             CreateMap<Comment, CommentDTO>().ReverseMap();
             CreateMap<Favorite, FavoriteDTO>().ReverseMap();
             CreateMap<Feedback, FeedbackDTO>().ReverseMap();

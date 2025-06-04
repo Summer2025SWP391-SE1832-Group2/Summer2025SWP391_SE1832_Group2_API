@@ -35,7 +35,7 @@ builder.Services.AddScoped<ITestParameterService, TestParameterService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
+builder.Services.AddScoped<ISampleCollectionScheduleService, SampleCollectionScheduleService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

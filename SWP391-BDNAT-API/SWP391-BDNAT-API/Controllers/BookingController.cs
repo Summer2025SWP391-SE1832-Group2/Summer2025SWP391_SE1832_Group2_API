@@ -28,6 +28,19 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet("/BookingWithSchedule()")]
+        public async Task<ActionResult<List<BookingScheduleDTO>>> GetAllBookingWithSchedule()
+        {
+            try
+            {
+                var list = await _bookingService.GetAllBookingWithScheduleAsync();
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<BookingDTO>> GetBookingById(int id)
