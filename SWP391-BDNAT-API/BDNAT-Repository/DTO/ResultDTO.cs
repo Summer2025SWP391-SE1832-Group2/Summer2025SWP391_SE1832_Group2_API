@@ -8,7 +8,7 @@ namespace BDNAT_Repository.DTO
 {
     public class ResultDetailDTO
     {
-        public int ResultId { get; set; }
+        public int ResultDetailId { get; set; }
 
         public int? BookingId { get; set; }
 
