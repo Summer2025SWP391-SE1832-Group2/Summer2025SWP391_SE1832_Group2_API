@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BDNAT_Repository.Interface
 {
-    public interface IResultRepo : IGenericRepository<Result>
+    public interface IResultDetailRepo : IGenericRepository<ResultDetail>
     {
     }
 }

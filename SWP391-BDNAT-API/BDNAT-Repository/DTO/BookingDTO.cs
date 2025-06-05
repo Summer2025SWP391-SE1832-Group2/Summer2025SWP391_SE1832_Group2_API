@@ -18,7 +18,7 @@ namespace BDNAT_Repository.DTO
         public string? Status { get; set; }
         public bool BuyKit { get; set; }
 
-        public bool Method { get; set; }
+        public string Method { get; set; } = null!;
 
         public string? PaymentStatus { get; set; }
 

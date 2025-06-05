@@ -29,6 +29,20 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("{id}/getByService")]
+        public async Task<ActionResult<List<TestParameterDTO>>> GetAllTestParameterByServiceId(int id)
+        {
+            try
+            {
+                var list = await _testParameterService.GetTestParametersByServiceIdAsync(id);
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<TestParameterDTO>> GetTestParameterById(int id)
         {

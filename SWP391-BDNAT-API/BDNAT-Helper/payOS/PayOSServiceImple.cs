@@ -43,8 +43,8 @@ namespace BDNAT_Helper.payOS
                 amount: (int)amount,
                 description: "Thanh toán đơn hàng",
                 items: items,
-                returnUrl: "https://e-learning-website-bay.vercel.app/payment-success",
-                cancelUrl: "https://e-learning-website-bay.vercel.app/payment-fail"
+                returnUrl: "https://summer2025swp391-se1832-group2-fe.onrender.com/payment/success",
+                cancelUrl: "https://summer2025swp391-se1832-group2-fe.onrender.com/payment/failed"
             );
 
             var paymentUrl = await _payOSService.CreatePaymentLink(payOSModel);

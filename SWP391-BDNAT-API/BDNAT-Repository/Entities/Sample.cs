@@ -26,4 +26,6 @@ public partial class Sample
     public virtual Booking? Booking { get; set; }
 
     public virtual User? CollectedByNavigation { get; set; }
+
+    public virtual ICollection<ResultDetail> ResultDetails { get; set; } = new List<ResultDetail>();
 }

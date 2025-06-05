@@ -1,4 +1,5 @@
 ﻿using BDNAT_Repository.DTO;
+using BDNAT_Repository.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace BDNAT_Service.Interface
         Task<bool> CreateTestParameterAsync(TestParameterDTO testParameter);
         Task<bool> UpdateTestParameterAsync(TestParameterDTO testParameter);
         Task<bool> DeleteTestParameterAsync(int id);
+        Task<List<TestParameterAndValueDTO>> GetTestParametersByServiceIdAsync(int ServiceId);
     }
 }

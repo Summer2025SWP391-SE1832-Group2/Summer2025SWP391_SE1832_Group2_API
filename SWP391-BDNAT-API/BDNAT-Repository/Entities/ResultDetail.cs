@@ -13,9 +13,11 @@ public partial class ResultDetail
 
     public string? Value { get; set; }
 
-    public string? Note { get; set; }
+    public int SampleId { get; set; }
 
     public virtual Booking Booking { get; set; } = null!;
+
+    public virtual Sample Sample { get; set; } = null!;
 
     public virtual TestParameter TestParameter { get; set; } = null!;
 }

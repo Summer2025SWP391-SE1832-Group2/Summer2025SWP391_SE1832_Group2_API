@@ -112,6 +112,9 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.BookingDate).HasColumnType("date");
+            entity.Property(e => e.Method)
+                .HasMaxLength(20)
+                .IsUnicode(false);
             entity.Property(e => e.PaymentStatus).HasMaxLength(50);
             entity.Property(e => e.PreferredDate).HasColumnType("date");
             entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
@@ -269,6 +272,7 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.ResultDetailId).HasColumnName("ResultDetailID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.SampleId).HasColumnName("SampleID");
             entity.Property(e => e.TestParameterId).HasColumnName("TestParameterID");
             entity.Property(e => e.Value).HasMaxLength(100);
 
@@ -276,6 +280,11 @@ public partial class DnaTestingDbContext : DbContext
                 .HasForeignKey(d => d.BookingId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Result_Booking");
+
+            entity.HasOne(d => d.Sample).WithMany(p => p.ResultDetails)
+                .HasForeignKey(d => d.SampleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ResultDetails_Sample");
 
             entity.HasOne(d => d.TestParameter).WithMany(p => p.ResultDetails)
                 .HasForeignKey(d => d.TestParameterId)
