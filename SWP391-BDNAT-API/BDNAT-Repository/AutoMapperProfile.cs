@@ -28,13 +28,14 @@ namespace BDNAT_Repository
             CreateMap<KitOrder, KitOrderDTO>().ReverseMap();
             CreateMap<Parameter, ParameterDTO>().ReverseMap();
             CreateMap<Rating, RatingDTO>().ReverseMap();
-            CreateMap<Result, ResultDTO>().ReverseMap();
+            CreateMap<ResultDetail, ResultDetailDTO>().ReverseMap();
             CreateMap<Sample, SampleDTO>().ReverseMap();
             CreateMap<Service, ServiceDTO>().ReverseMap();
             CreateMap<ServiceType, ServiceTypeDTO>().ReverseMap();
             CreateMap<ShippingOrder, ShippingOrderDTO>().ReverseMap();
             CreateMap<TestKit, TestKitDTO>().ReverseMap();
             CreateMap<TestParameter, TestParameterDTO>().ReverseMap();
+            CreateMap<TestParameter, TestParameterAndValueDTO>().ReverseMap();
             CreateMap<Transaction, TransactionDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<User, RegisterRequest>().ReverseMap();

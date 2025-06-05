@@ -1,6 +1,7 @@
 ﻿using BDNAT_Repository.DTO;
 using BDNAT_Service.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace SWP391_BDNAT_API.Controllers
 {
@@ -101,6 +102,16 @@ namespace SWP391_BDNAT_API.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+
+        [HttpPost("receive-hook")]
+        public IActionResult ReceiveHook([FromBody] JsonElement data)
+        {
+            // In dữ liệu webhook ra console
+            Console.WriteLine(data.ToString());
+
+            // Trả về 200 OK
+            return Ok();
         }
     }
 }

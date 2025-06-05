@@ -34,7 +34,7 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IKitOrderService, KitOrderService>();
 builder.Services.AddScoped<IParameterService, ParameterService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
-builder.Services.AddScoped<IResultService, ResultService>();
+builder.Services.AddScoped<IResultDetailService, ResultDetailService>();
 builder.Services.AddScoped<ISampleService, SampleService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<IServiceTypeService, ServiceTypeService>();

@@ -6,17 +6,17 @@ namespace SWP391_BDNAT_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ResultController : ControllerBase
+    public class ResultDetailController : ControllerBase
     {
-        private readonly IResultService _resultService;
+        private readonly IResultDetailService _resultService;
 
-        public ResultController(IResultService resultService)
+        public ResultDetailController(IResultDetailService resultService)
         {
             _resultService = resultService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ResultDTO>>> GetAllResults()
+        public async Task<ActionResult<List<ResultDetailDTO>>> GetAllResults()
         {
             try
             {
@@ -29,8 +29,22 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("{id}/getAllResultByBookingId")]
+        public async Task<ActionResult<List<ResultDetailDTO>>> GetAllResultsByBookingID(int id)
+        {
+            try
+            {
+                var list = await _resultService.GetResultDetailsByBookingIdAsync(id);
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<ResultDTO>> GetResultById(int id)
+        public async Task<ActionResult<ResultDetailDTO>> GetResultById(int id)
         {
             try
             {
@@ -45,8 +59,21 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult<bool>> CreateResult([FromBody] ResultDTO dto)
+        [HttpPost("createMultipleResults")]
+        public async Task<IActionResult> CreateMultipleResults([FromBody] SaveResultDetailRequest dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var success = await _resultService.CreateMultipleResultsAsync(dto);
+            if (success)
+                return Ok("Result details saved successfully.");
+
+            return BadRequest("Failed to save result details.");
+        }
+
+        [HttpPost("createResult")]
+        public async Task<ActionResult<bool>> CreateResult([FromBody] ResultDetailDTO dto)
         {
             try
             {
@@ -63,7 +90,7 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<bool>> UpdateResult([FromBody] ResultDTO dto)
+        public async Task<ActionResult<bool>> UpdateResult([FromBody] ResultDetailDTO dto)
         {
             try
             {

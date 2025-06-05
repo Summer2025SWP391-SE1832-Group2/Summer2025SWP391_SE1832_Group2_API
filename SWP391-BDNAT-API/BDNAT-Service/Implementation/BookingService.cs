@@ -47,11 +47,18 @@ namespace BDNAT_Service.Implementation
             var scheduleCreated = await SampleCollectionScheduleRepo.Instance.InsertAsync(schedule);
             if (!scheduleCreated)
                 return null;
+            decimal amount = 0;
             var service = await ServiceRepo.Instance.GetByIdAsync(bookingDto.ServiceId);
-            // Gọi dịch vụ tạo link thanh toán
-            var amount = service.Price ?? 0; // Bạn cần thêm Amount vào DTO nếu chưa có
+            if (bookingDto.Method.Equals("Delivery"))
+            {
+                amount = (decimal)(service.Price + 3000);
+            }else if (booking.Method.Equals("SupportAtHome")){
+                amount = (decimal)(service.Price + 3000 + ((decimal)service.Price * 0.2m));
+            }else
+            {
+                amount = (decimal)(service.Price);
+            }
             var paymentUrl = await _payOSService.RequestWithPayOsAsync(booking, amount);
-
             return paymentUrl;
         }
 
@@ -68,10 +75,10 @@ namespace BDNAT_Service.Implementation
             return list.Select(x => _mapper.Map<BookingDTO>(x)).ToList();
         }
 
-        public async Task<List<BookingDTO>> GetAllBookingWithScheduleAsync()
+        public async Task<List<BookingScheduleDTO>> GetAllBookingWithScheduleAsync()
         {
             var list = await BookingRepo.Instance.GetAllBookingWithSchedule();
-            return list.Select(x => _mapper.Map<BookingDTO>(x)).ToList() ;
+            return list.Select(x => _mapper.Map<BookingScheduleDTO>(x)).ToList() ;
         }
 
         public async Task<BookingDTO> GetBookingByIdAsync(int id)

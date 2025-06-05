@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BDNAT_Repository.DTO
 {
-    public class ResultDTO
+    public class ResultDetailDTO
     {
         public int ResultId { get; set; }
 
@@ -16,6 +16,12 @@ namespace BDNAT_Repository.DTO
 
         public string? Value { get; set; }
 
-        public string? Note { get; set; }
+        public int? SampleId { get; set; }
+    }
+
+    public class SaveResultDetailRequest
+    {
+        public int BookingId { get; set; }
+        public List<ResultDetailDTO> Results { get; set; } = new();
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BDNAT_Service.Implementation
 {
@@ -40,6 +41,27 @@ namespace BDNAT_Service.Implementation
         public async Task<TestParameterDTO> GetTestParameterByIdAsync(int id)
         {
             return _mapper.Map<TestParameterDTO>(await TestParameterRepo.Instance.GetByIdAsync(id));
+        }
+
+        public async Task<List<TestParameterAndValueDTO>> GetTestParametersByServiceIdAsync(int serviceId)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                return await context.TestParameters
+                    .Include(tp => tp.Parameter)
+                    .Where(tp => tp.ServiceId == serviceId)
+                    .Select(tp => new TestParameterAndValueDTO
+                    {
+                        TestParameterId = tp.TestParameterId,
+                        ServiceId = tp.ServiceId,
+                        ParameterId = tp.ParameterId,
+                        DisplayOrder = tp.DisplayOrder,
+                        Name = tp.Parameter != null ? tp.Parameter.Name : null,
+                        Unit = tp.Parameter != null ? tp.Parameter.Unit : null,
+                        Description = tp.Parameter != null ? tp.Parameter.Description : null
+                    })
+                    .ToListAsync();
+            }
         }
 
         public async Task<bool> UpdateTestParameterAsync(TestParameterDTO testParameter)
