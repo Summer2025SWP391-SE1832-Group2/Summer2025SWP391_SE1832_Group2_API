@@ -35,5 +35,16 @@ namespace BDNAT_Repository.Implementation
                     .ToListAsync();
             }
         }
+
+        public async Task<Booking> GetBookingByUserIdAsync(int id)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                return await context.Bookings
+                    .Include(b => b.SampleCollectionSchedules)
+                    .FirstOrDefaultAsync(b => b.UserId == id);
+            }
+        }
+
     }
 }

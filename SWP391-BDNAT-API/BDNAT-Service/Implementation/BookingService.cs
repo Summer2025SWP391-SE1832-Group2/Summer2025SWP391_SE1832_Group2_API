@@ -79,6 +79,11 @@ namespace BDNAT_Service.Implementation
             return _mapper.Map<BookingDTO>(await BookingRepo.Instance.GetByIdAsync(id));
         }
 
+        public async Task<BookingDTO> GetBookingByUserIdAsync(int id)
+        {
+            return _mapper.Map<BookingDTO>(await BookingRepo.Instance.GetBookingByUserIdAsync(id));
+        }
+
         public async Task<bool> UpdateBookingAsync(BookingDTO booking)
         {
             var map = _mapper.Map<Booking>(booking);
