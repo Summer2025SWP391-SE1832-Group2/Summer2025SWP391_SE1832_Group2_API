@@ -1,5 +1,6 @@
 ﻿using BDNAT_Repository.Entities;
 using BDNAT_Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,11 @@ namespace BDNAT_Repository.Implementation
                 }
                 return _instance;
             }
+        }
+
+        public async Task<Transaction> GetByOrderCodeAsync(string orderCode)
+        {
+            return await _context.Transactions.FirstOrDefaultAsync(t => t.OrderCode == orderCode);
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -37,7 +38,8 @@ namespace BDNAT_Repository.Implementation
 
         public async Task AddRangeAsync(IEnumerable<ResultDetail> resultDetails)
         {
-            try {
+            try
+            {
                 _context.ResultDetails.AddRange(resultDetails);
                 await _context.SaveChangesAsync();
             }
@@ -47,7 +49,21 @@ namespace BDNAT_Repository.Implementation
                 Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
                 _context.ChangeTracker.Clear();
                 throw;
-            }          
+            }
+        }
+
+        public async Task<bool> DeleteWhereAsync(Expression<Func<ResultDetail, bool>> predicate)
+        {
+            var resultDetails = await _context.ResultDetails
+                .Where(predicate)
+                .ToListAsync();
+
+            if (!resultDetails.Any())
+                return false;
+
+            _context.ResultDetails.RemoveRange(resultDetails);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

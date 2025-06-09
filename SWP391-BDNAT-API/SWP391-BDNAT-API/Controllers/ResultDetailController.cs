@@ -116,5 +116,24 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpDelete("sample/{sampleId}")]
+        public async Task<IActionResult> DeleteBySampleId(int sampleId)
+        {
+            var success = await _resultService.DeleteBySampleIdAsync(sampleId);
+            if (success)
+                return Ok("Deleted results by SampleId successfully.");
+            return NotFound("No results found for the given SampleId.");
+        }
+
+        // DELETE BY BOOKING ID
+        [HttpDelete("booking/{bookingId}")]
+        public async Task<IActionResult> DeleteByBookingId(int bookingId)
+        {
+            var success = await _resultService.DeleteByBookingIdAsync(bookingId);
+            if (success)
+                return Ok("Deleted results by BookingId successfully.");
+            return NotFound("No results found for the given BookingId.");
+        }
     }
 }

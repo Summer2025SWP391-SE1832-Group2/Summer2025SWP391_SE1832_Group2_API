@@ -17,5 +17,7 @@ namespace BDNAT_Service.Interface
         Task<bool> UpdateResultAsync(ResultDetailDTO result);
         Task<bool> DeleteResultAsync(int id);
         Task<List<ResultDetailDTO>> GetResultDetailsByBookingIdAsync(int BookingId);
+        Task<bool> DeleteBySampleIdAsync(int sampleId);
+        Task<bool> DeleteByBookingIdAsync(int bookingId);
     }
 }

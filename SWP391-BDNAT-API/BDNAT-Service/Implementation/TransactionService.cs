@@ -37,6 +37,11 @@ namespace BDNAT_Service.Implementation
             return list.Select(x => _mapper.Map<TransactionDTO>(x)).ToList();
         }
 
+        public async Task<TransactionDTO> GetByOrderCodeAsync(string orderCode)
+        {
+            return _mapper.Map<TransactionDTO>(await TransactionRepo.Instance.GetByOrderCodeAsync(orderCode));
+        }
+
         public async Task<TransactionDTO> GetTransactionByIdAsync(int id)
         {
             return _mapper.Map<TransactionDTO>(await TransactionRepo.Instance.GetByIdAsync(id));

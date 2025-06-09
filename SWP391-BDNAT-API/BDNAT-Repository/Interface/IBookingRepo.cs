@@ -10,6 +10,6 @@ namespace BDNAT_Repository.Interface
     public interface IBookingRepo : IGenericRepository<Booking>
     {
         Task<List<Booking>> GetAllBookingWithSchedule();
-        Task<Booking> GetBookingByUserIdAsync(int id);
+        Task<List<Booking>> GetBookingByUserIdAsync(int id);
     }
 }

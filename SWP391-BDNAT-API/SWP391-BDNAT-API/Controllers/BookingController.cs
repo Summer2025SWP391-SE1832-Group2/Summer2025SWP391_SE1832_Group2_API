@@ -1,4 +1,5 @@
 ﻿using BDNAT_Repository.DTO;
+using BDNAT_Repository.Implementation;
 using BDNAT_Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -58,14 +59,14 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpGet("{UserId}")]
-        public async Task<ActionResult<BookingDTO>> GetBookingByUserId(int id)
+        [HttpGet("{UserId}/getByUserId")]
+        public async Task<ActionResult<List<BookingDTO>>> GetBookingByUserId(int UserId)
         {
             try
             {
-                var item = await _bookingService.GetBookingByIdAsync(id);
+                var item = await _bookingService.GetBookingByUserIdAsync(UserId);
                 if (item == null)
-                    return NotFound($"Booking with ID {id} not found");
+                    return NotFound($"Booking with ID {UserId} not found");
                 return Ok(item);
             }
             catch (Exception ex)
@@ -119,14 +120,5 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
-        [HttpPost("receive-hook")]
-        public IActionResult ReceiveHook([FromBody] JsonElement data)
-        {
-            // In dữ liệu webhook ra console
-            Console.WriteLine(data.ToString());
-
-            // Trả về 200 OK
-            return Ok();
-        }
     }
 }

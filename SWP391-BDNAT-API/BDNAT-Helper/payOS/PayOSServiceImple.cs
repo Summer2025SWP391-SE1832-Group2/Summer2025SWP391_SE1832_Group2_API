@@ -50,20 +50,6 @@ namespace BDNAT_Helper.payOS
             var paymentUrl = await _payOSService.CreatePaymentLink(payOSModel);
             if (paymentUrl != null)
             {
-                // Sau khi tạo link thanh toán thành công, tạo bản ghi Transaction nếu bạn muốn
-                var transaction = new BDNAT_Repository.Entities.Transaction
-                {
-                    BookingId = order.BookingId, // Assuming Booking has BookingId
-                    OrderCode = orderCode.ToString(),
-                    PaymentGateway = "PAYOS",
-                    Price = amount,
-                    Status = "PENDING",
-                    PaymentMethod = "BANK_TRANSFER", // hoặc để null để PayOS tự xác định
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                };
-                await TransactionRepo.Instance.InsertAsync(transaction);
-
                 return paymentUrl.checkoutUrl;
             }
 

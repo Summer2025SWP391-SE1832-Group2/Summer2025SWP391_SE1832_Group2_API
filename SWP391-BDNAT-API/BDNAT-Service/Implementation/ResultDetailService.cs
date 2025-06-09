@@ -65,6 +65,16 @@ namespace BDNAT_Service.Implementation
             return list.Select(x => _mapper.Map<ResultDetailDTO>(x)).ToList();
         }
 
+        public async Task<bool> DeleteBySampleIdAsync(int sampleId)
+        {
+            return await ResultDetailRepo.Instance.DeleteWhereAsync(r => r.SampleId == sampleId);
+        }
+
+        public async Task<bool> DeleteByBookingIdAsync(int bookingId)
+        {
+            return await ResultDetailRepo.Instance.DeleteWhereAsync(r => r.BookingId == bookingId);
+        }
+
         public async Task<bool> UpdateResultAsync(ResultDetailDTO result)
         {
             var map = _mapper.Map<ResultDetail>(result);

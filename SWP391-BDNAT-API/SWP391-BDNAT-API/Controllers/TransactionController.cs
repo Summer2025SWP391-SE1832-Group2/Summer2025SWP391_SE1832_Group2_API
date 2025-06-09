@@ -1,6 +1,9 @@
 ﻿using BDNAT_Repository.DTO;
+using BDNAT_Repository.Implementation;
+using BDNAT_Service.Implementation;
 using BDNAT_Service.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace SWP391_BDNAT_API.Controllers
 {
@@ -88,6 +91,32 @@ namespace SWP391_BDNAT_API.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+
+        [HttpPost("receive-hook")]
+        public async Task<IActionResult> ReceiveHook([FromBody] JsonElement data)
+        {
+            string orderCode = data.GetProperty("orderCode").GetString();
+            string status = data.GetProperty("status").GetString(); // Ví dụ: "PAID", "FAILED", etc.
+
+            Console.WriteLine($"[Webhook] orderCode: {orderCode}, status: {status}");
+
+            var transaction = await _transactionService.GetByOrderCodeAsync(orderCode);
+
+            if (transaction != null)
+            {
+                transaction.Status = status switch
+                {
+                    "PAID" => "SUCCESS",
+                    "FAILED" => "FAILED",
+                    _ => transaction.Status
+                };
+                transaction.UpdatedAt = DateTime.Now;
+
+                await _transactionService.UpdateTransactionAsync(transaction);
+            }
+
+            return Ok();
         }
     }
 }
