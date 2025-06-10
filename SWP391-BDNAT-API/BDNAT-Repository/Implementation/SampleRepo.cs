@@ -1,5 +1,6 @@
 ﻿using BDNAT_Repository.Entities;
 using BDNAT_Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,17 @@ namespace BDNAT_Repository.Implementation
                     _instance = new SampleRepo();
                 }
                 return _instance;
+            }
+        }
+
+
+        public async Task<List<Sample>> GetSamplesByBookingIdAsync(int bookingId)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                return await context.Samples
+                    .Where(s => s.BookingId == bookingId)
+                    .ToListAsync();
             }
         }
     }

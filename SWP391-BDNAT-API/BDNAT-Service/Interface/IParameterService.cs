@@ -12,6 +12,9 @@ namespace BDNAT_Service.Interface
         Task<List<ParameterDTO>> GetAllParametersAsync();
         Task<ParameterDTO> GetParameterByIdAsync(int id);
         Task<bool> CreateParameterAsync(ParameterDTO parameter);
+
+        Task<bool> CreateListParameterAsync(List<ParameterDTO> parameter);
+
         Task<bool> UpdateParameterAsync(ParameterDTO parameter);
         Task<bool> DeleteParameterAsync(int id);
     }

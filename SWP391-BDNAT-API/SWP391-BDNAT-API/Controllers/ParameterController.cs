@@ -61,6 +61,22 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpPost("create-list")]
+        public async Task<ActionResult<bool>> CreateListParameter([FromBody] List<ParameterDTO> dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var result = await _parameterService.CreateListParameterAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
         [HttpPut]
         public async Task<ActionResult<bool>> UpdateParameter([FromBody] ParameterDTO dto)
