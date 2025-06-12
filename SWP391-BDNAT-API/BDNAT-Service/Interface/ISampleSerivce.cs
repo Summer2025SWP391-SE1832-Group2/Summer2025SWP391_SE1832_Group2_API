@@ -11,6 +11,8 @@ namespace BDNAT_Service.Interface
     {
         Task<List<SampleDTO>> GetAllSamplesAsync();
         Task<SampleDTO> GetSampleByIdAsync(int id);
+        Task<List<SampleDTO>> GetSampleByBookingIdAsync(int id);
+
         Task<bool> CreateSampleAsync(SampleDTO sample);
         Task<bool> UpdateSampleAsync(SampleDTO sample);
         Task<bool> DeleteSampleAsync(int id);

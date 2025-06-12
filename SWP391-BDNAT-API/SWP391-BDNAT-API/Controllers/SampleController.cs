@@ -44,7 +44,21 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
+        [HttpGet("by-booking-id/{id}")]
+        public async Task<ActionResult<List<SampleDTO>>> GetSampleByBookingId(int id)
+        {
+            try
+            {
+                var item = await _sampleService.GetSampleByBookingIdAsync(id);
+                if (item == null)
+                    return NotFound($"Sample with ID {id} not found");
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
         [HttpPost]
         public async Task<ActionResult<bool>> CreateSample([FromBody] SampleDTO dto)
         {

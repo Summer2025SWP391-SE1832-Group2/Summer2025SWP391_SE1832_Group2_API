@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BDNAT_Service.Implementation
 {
@@ -18,6 +19,22 @@ namespace BDNAT_Service.Implementation
         public ParameterService(IMapper mapper)
         {
             _mapper = mapper;
+        }
+
+        public async Task<bool> CreateListParameterAsync(List<ParameterDTO> parameter)
+        {
+            var parameterEntities = _mapper.Map<List<Parameter>>(parameter);
+
+            foreach (var param in parameterEntities)
+            {
+                var success = await ParameterRepo.Instance.InsertAsync(param);
+                if (!success)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public async Task<bool> CreateParameterAsync(ParameterDTO parameter)
