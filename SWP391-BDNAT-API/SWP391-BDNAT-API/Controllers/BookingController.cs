@@ -44,6 +44,20 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("/BookingWithSample")]
+        public async Task<ActionResult<List<BookingSampleDTO>>> GetAllBookingWithSample()
+        {
+            try
+            {
+                var list = await _bookingService.GetAllBookingWithSampleAsync();
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<BookingDTO>> GetBookingById(int id)
         {

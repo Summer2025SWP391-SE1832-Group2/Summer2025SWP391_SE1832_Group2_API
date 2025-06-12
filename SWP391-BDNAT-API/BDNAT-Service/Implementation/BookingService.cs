@@ -75,6 +75,12 @@ namespace BDNAT_Service.Implementation
             return list.Select(x => _mapper.Map<BookingDTO>(x)).ToList();
         }
 
+        public async Task<List<BookingSampleDTO>> GetAllBookingWithSampleAsync()
+        {
+            var list = await BookingRepo.Instance.GetAllBookingWithSample();
+            return list.Select(x => _mapper.Map<BookingSampleDTO>(x)).ToList();
+        }
+
         public async Task<List<BookingScheduleDTO>> GetAllBookingWithScheduleAsync()
         {
             var list = await BookingRepo.Instance.GetAllBookingWithSchedule();
