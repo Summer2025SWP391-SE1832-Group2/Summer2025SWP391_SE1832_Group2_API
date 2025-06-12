@@ -31,7 +31,7 @@ namespace BDNAT_Repository.Implementation
             using (var context = new DnaTestingDbContext())
             {
                 return await context.Bookings
-                    .Include(b => b.SampleCollectionSchedules) 
+                    .Include(b => b.SampleCollectionSchedules)
                     .ToListAsync();
             }
         }
@@ -46,5 +46,13 @@ namespace BDNAT_Repository.Implementation
             }
         }
 
+        public async Task<Booking> GetBookingByOrderCodeAsync(long id)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                return await context.Bookings
+                    .FirstOrDefaultAsync(b => b.OrderCode == id);
+            }
+        }
     }
 }

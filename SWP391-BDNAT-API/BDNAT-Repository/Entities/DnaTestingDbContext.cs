@@ -112,6 +112,7 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.BookingDate).HasColumnType("date");
+            entity.Property(e => e.DocumentsVerify).IsUnicode(false);
             entity.Property(e => e.Method)
                 .HasMaxLength(20)
                 .IsUnicode(false);
@@ -484,9 +485,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.OrderCode)
-                .HasMaxLength(50)
-                .IsUnicode(false);
             entity.Property(e => e.PaymentGateway)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -524,6 +522,7 @@ public partial class DnaTestingDbContext : DbContext
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC1196B26D");
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.Address).HasMaxLength(50);
             entity.Property(e => e.DateOfBirth).HasColumnType("date");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);

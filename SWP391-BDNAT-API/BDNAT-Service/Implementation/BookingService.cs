@@ -27,8 +27,10 @@ namespace BDNAT_Service.Implementation
 
         public async Task<string?> CreateBookingAsync(BookingDTO bookingDto)
         {
+            // Map booking
             var booking = _mapper.Map<Booking>(bookingDto);
-
+            long orderCode = long.Parse(DateTimeOffset.Now.ToString("yyMMddHHmmss"));
+            booking.OrderCode = orderCode;
             // Insert booking
             var bookingCreated = await BookingRepo.Instance.InsertAsync(booking);
             if (!bookingCreated)
@@ -52,13 +54,40 @@ namespace BDNAT_Service.Implementation
             if (bookingDto.Method.Equals("Delivery"))
             {
                 amount = (decimal)(service.Price + 3000);
-            }else if (booking.Method.Equals("SupportAtHome")){
+            }
+            else if (booking.Method.Equals("SupportAtHome"))
+            {
                 amount = (decimal)(service.Price + 3000 + ((decimal)service.Price * 0.2m));
-            }else
+            }
+            else
             {
                 amount = (decimal)(service.Price);
             }
-            var paymentUrl = await _payOSService.RequestWithPayOsAsync(booking, amount);
+
+            
+            var paymentUrl = await _payOSService.RequestWithPayOsAsync(booking, amount,orderCode);
+
+            // Kiểm tra nếu không có paymentUrl thì dừng lại
+            if (string.IsNullOrEmpty(paymentUrl))
+                return null;
+
+            // BƯỚC 5: Tạo Transaction nếu có paymentUrl
+            
+            var transaction = new Transaction
+            {
+                BookingId = booking.BookingId,
+                UserId = booking.UserId,
+                Description = "Thanh toán đơn hàng",
+                Price = amount,
+                OrderCode = orderCode,
+                PaymentGateway = "PayOS",
+                Status = "PENDING",
+                PaymentUrl = paymentUrl,
+                CreatedAt = DateTime.Now
+            };
+            await TransactionRepo.Instance.InsertAsync(transaction);
+
+            // Trả về link thanh toán
             return paymentUrl;
         }
 

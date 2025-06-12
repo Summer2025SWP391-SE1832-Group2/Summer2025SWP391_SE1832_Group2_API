@@ -15,7 +15,7 @@ public partial class Transaction
 
     public int? UserId { get; set; }
 
-    public string OrderCode { get; set; } = null!;
+    public long OrderCode { get; set; }
 
     public string? TransactionCode { get; set; }
 

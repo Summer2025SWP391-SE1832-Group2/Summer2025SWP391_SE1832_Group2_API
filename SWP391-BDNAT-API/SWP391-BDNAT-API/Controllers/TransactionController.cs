@@ -94,29 +94,17 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPost("receive-hook")]
-        public async Task<IActionResult> ReceiveHook([FromBody] JsonElement data)
+        public async Task<IActionResult> ReceiveHook([FromBody] JsonElement payload)
         {
-            string orderCode = data.GetProperty("orderCode").GetString();
-            string status = data.GetProperty("status").GetString(); // Ví dụ: "PAID", "FAILED", etc.
-
-            Console.WriteLine($"[Webhook] orderCode: {orderCode}, status: {status}");
-
-            var transaction = await _transactionService.GetByOrderCodeAsync(orderCode);
-
-            if (transaction != null)
+            var success = await _transactionService.HandleWebhookAsync(payload);
+            if (success)
             {
-                transaction.Status = status switch
-                {
-                    "PAID" => "SUCCESS",
-                    "FAILED" => "FAILED",
-                    _ => transaction.Status
-                };
-                transaction.UpdatedAt = DateTime.Now;
-
-                await _transactionService.UpdateTransactionAsync(transaction);
+                return Ok("Transaction updated successfully");
             }
-
-            return Ok();
+            else
+            {
+                return StatusCode(500, "Failed to handle webhook");
+            }
         }
     }
 }
