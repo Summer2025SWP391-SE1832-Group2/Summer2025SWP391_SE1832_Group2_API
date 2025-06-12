@@ -40,6 +40,7 @@ namespace BDNAT_Repository
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<User, RegisterRequest>().ReverseMap();
             CreateMap<SampleCollectionSchedule, SampleCollectionScheduleDTO>().ReverseMap();
+            CreateMap<Team, TeamDTO>().ReverseMap();
         }
     }
 }
