@@ -25,10 +25,12 @@ namespace BDNAT_Service.Implementation
             _payOSService = payOSService;
         }
 
-        public async Task<string?> CreateBookingAsync(BookingDTO bookingDto)
+        public async Task<string?> CreateBookingAsync(BookingRequestDTO bookingDto)
         {
             // Map booking
             var booking = _mapper.Map<Booking>(bookingDto);
+            booking.BookingDate = DateTime.Now;
+            booking.PreferredDate = bookingDto.CollectionDate.AddDays(1);
             long orderCode = long.Parse(DateTimeOffset.Now.ToString("yyMMddHHmmss"));
             booking.OrderCode = orderCode;
             // Insert booking
@@ -40,7 +42,7 @@ namespace BDNAT_Service.Implementation
             var schedule = new SampleCollectionSchedule
             {
                 BookingId = booking.BookingId,
-                CollectionDate = bookingDto.PreferredDate ?? DateTime.Now,
+                CollectionDate = bookingDto.CollectionDate,
                 Time = bookingDto.Time,
                 Location = bookingDto.Location,
                 Status = "Pending"
@@ -98,10 +100,10 @@ namespace BDNAT_Service.Implementation
             return await BookingRepo.Instance.DeleteAsync(id);
         }
 
-        public async Task<List<BookingDTO>> GetAllBookingsAsync()
+        public async Task<List<BookingDisplayDTO>> GetAllBookingsAsync()
         {
             var list = await BookingRepo.Instance.GetAllAsync();
-            return list.Select(x => _mapper.Map<BookingDTO>(x)).ToList();
+            return list.Select(x => _mapper.Map<BookingDisplayDTO>(x)).ToList();
         }
 
         public async Task<List<BookingSampleDTO>> GetAllBookingWithSampleAsync()
@@ -110,25 +112,63 @@ namespace BDNAT_Service.Implementation
             return list.Select(x => _mapper.Map<BookingSampleDTO>(x)).ToList();
         }
 
-        public async Task<List<BookingScheduleDTO>> GetAllBookingWithScheduleAsync()
+        public async Task<List<BookingDisplayDTO>> GetAllBookingWithScheduleAsync()
         {
             var list = await BookingRepo.Instance.GetAllBookingWithSchedule();
-            return list.Select(x => _mapper.Map<BookingScheduleDTO>(x)).ToList() ;
+            var result = list.Select(x =>
+            {
+                var schedule = x.SampleCollectionSchedules?.FirstOrDefault();
+
+                return new BookingDisplayDTO
+                {
+                    BookingId = x.BookingId,
+                    UserId = x.UserId,
+                    BookingDate = x.BookingDate,
+                    Status = x.Status,
+                    PaymentStatus = x.PaymentStatus,
+                    PreferredDate = x.PreferredDate,
+                    Method = x.Method,
+                    CollectionDate = schedule?.CollectionDate,
+                    Time = schedule?.Time,
+                    Location = schedule?.Location ?? ""
+                };
+            }).ToList();
+
+            return result;
         }
 
-        public async Task<BookingDTO> GetBookingByIdAsync(int id)
+        public async Task<BookingDisplayDTO> GetBookingByIdAsync(int id)
         {
-            return _mapper.Map<BookingDTO>(await BookingRepo.Instance.GetByIdAsync(id));
+            return _mapper.Map<BookingDisplayDTO>(await BookingRepo.Instance.GetByIdAsync(id));
         }
 
-        public async Task<List<BookingDTO>> GetBookingByUserIdAsync(int id)
+        public async Task<List<BookingDisplayDTO>> GetBookingByUserIdAsync(int id)
         {
-
             var list = await BookingRepo.Instance.GetBookingByUserIdAsync(id);
-            return list.Select(x => _mapper.Map<BookingDTO>(x)).ToList();
+
+            var result = list.Select(x =>
+            {
+                var schedule = x.SampleCollectionSchedules?.FirstOrDefault();
+
+                return new BookingDisplayDTO
+                {
+                    BookingId = x.BookingId,
+                    UserId = x.UserId,
+                    BookingDate = x.BookingDate,
+                    Status = x.Status,
+                    PaymentStatus = x.PaymentStatus,
+                    PreferredDate = x.PreferredDate,
+                    Method = x.Method,
+                    CollectionDate = schedule?.CollectionDate,
+                    Time = schedule?.Time,
+                    Location = schedule?.Location ?? ""
+                };
+            }).ToList();
+
+            return result;
         }
 
-        public async Task<bool> UpdateBookingAsync(BookingDTO booking)
+        public async Task<bool> UpdateBookingAsync(BookingRequestDTO booking)
         {
             var map = _mapper.Map<Booking>(booking);
             return await BookingRepo.Instance.UpdateAsync(map);

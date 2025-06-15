@@ -56,7 +56,6 @@ namespace BDNAT_Repository.Implementation
             }
         }
 
-
         public async Task<Booking> GetBookingByOrderCodeAsync(long id)
         {
             using (var context = new DnaTestingDbContext())

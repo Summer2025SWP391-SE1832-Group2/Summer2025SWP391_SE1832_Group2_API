@@ -18,7 +18,7 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<BookingDTO>>> GetAllBookings()
+        public async Task<ActionResult<List<BookingDisplayDTO>>> GetAllBookings()
         {
             try
             {
@@ -31,7 +31,7 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
         [HttpGet("/BookingWithSchedule")]
-        public async Task<ActionResult<List<BookingScheduleDTO>>> GetAllBookingWithSchedule()
+        public async Task<ActionResult<List<BookingDisplayDTO>>> GetAllBookingWithSchedule()
         {
             try
             {
@@ -59,7 +59,7 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<BookingDTO>> GetBookingById(int id)
+        public async Task<ActionResult<BookingDisplayDTO>> GetBookingById(int id)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
         [HttpGet("{UserId}/getByUserId")]
-        public async Task<ActionResult<List<BookingDTO>>> GetBookingByUserId(int UserId)
+        public async Task<ActionResult<List<BookingDisplayDTO>>> GetBookingByUserId(int UserId)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateBooking([FromBody] BookingDTO dto)
+        public async Task<ActionResult<bool>> CreateBooking([FromBody] BookingRequestDTO dto)
         {
             try
             {
@@ -107,7 +107,7 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<bool>> UpdateBooking([FromBody] BookingDTO dto)
+        public async Task<ActionResult<bool>> UpdateBooking([FromBody] BookingRequestDTO dto)
         {
             try
             {

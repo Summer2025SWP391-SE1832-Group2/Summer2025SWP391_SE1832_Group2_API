@@ -31,9 +31,11 @@ namespace BDNAT_Repository.Implementation
             using (var context = new DnaTestingDbContext())
             {
                 return await context.Samples
+                    .Include(s => s.CollectedByNavigation) // assuming navigation property is named properly
                     .Where(s => s.BookingId == bookingId)
                     .ToListAsync();
             }
         }
+
     }
 }

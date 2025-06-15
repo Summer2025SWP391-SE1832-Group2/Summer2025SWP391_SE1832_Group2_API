@@ -45,7 +45,7 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
         [HttpGet("by-booking-id/{id}")]
-        public async Task<ActionResult<List<SampleDTO>>> GetSampleByBookingId(int id)
+        public async Task<ActionResult<List<SampleWithCollectorDTO>>> GetSampleByBookingId(int id)
         {
             try
             {

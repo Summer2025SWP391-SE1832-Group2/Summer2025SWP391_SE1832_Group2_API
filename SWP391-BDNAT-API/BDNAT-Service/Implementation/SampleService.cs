@@ -37,12 +37,26 @@ namespace BDNAT_Service.Implementation
             return list.Select(x => _mapper.Map<SampleDTO>(x)).ToList();
         }
 
-        public async Task<List<SampleDTO>> GetSampleByBookingIdAsync(int bookingId)
+        public async Task<List<SampleWithCollectorDTO>> GetSampleByBookingIdAsync(int bookingId)
         {
             var samples = await SampleRepo.Instance.GetSamplesByBookingIdAsync(bookingId);
-            return _mapper.Map<List<SampleDTO>>(samples);
-        }
 
+            var result = samples.Select(s => new SampleWithCollectorDTO
+            {
+                SampleId = s.SampleId,
+                BookingId = s.BookingId,
+                CollectedBy = s.CollectedBy?.ToString(),
+                CollectorName = s.CollectedByNavigation?.FullName,
+                CollectedDate = s.CollectedDate,
+                SampleType = s.SampleType,
+                ParticipantName = s.ParticipantName,
+                Notes = s.Notes,
+                Picture = s.Picture,
+                Transport = s.Transport
+            }).ToList();
+
+            return result;
+        }
 
         public async Task<SampleDTO> GetSampleByIdAsync(int id)
         {
