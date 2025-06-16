@@ -130,7 +130,7 @@ public partial class DnaTestingDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Booking__UserID__5629CD9C");
+                .HasConstraintName("FK_Booking_Users");
         });
 
         modelBuilder.Entity<Comment>(entity =>
@@ -352,7 +352,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.ShipDate).HasColumnType("datetime");
             entity.Property(e => e.Status).HasColumnType("datetime");
-            entity.Property(e => e.ToAddress).HasMaxLength(50);
 
             entity.HasOne(d => d.Booking).WithMany(p => p.SampleShipments)
                 .HasForeignKey(d => d.BookingId)
@@ -361,7 +360,6 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.HasOne(d => d.CollectedByNavigation).WithMany(p => p.SampleShipments)
                 .HasForeignKey(d => d.CollectedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SampleShipment_Users");
         });
 
