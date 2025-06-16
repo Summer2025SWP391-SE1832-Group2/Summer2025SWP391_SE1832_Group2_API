@@ -36,8 +36,8 @@ namespace BDNAT_Repository.DTO
         public int BookingId { get; set; }
 
         public int? ServiceTypeId { get; set; }
-
         public int? UserId { get; set; }
+        public string? UserName { get; set; }
 
         public DateTime? BookingDate { get; set; }
 

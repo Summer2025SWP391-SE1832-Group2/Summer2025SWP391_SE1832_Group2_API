@@ -31,7 +31,8 @@ namespace BDNAT_Repository.Implementation
             using (var context = new DnaTestingDbContext())
             {
                 return await context.Bookings
-                    .Include(b => b.SampleCollectionSchedules) 
+                    .Include(b => b.SampleCollectionSchedules)
+                    .Include(b => b.User)
                     .ToListAsync();
             }
         }
@@ -42,6 +43,8 @@ namespace BDNAT_Repository.Implementation
             {
                 return await context.Bookings
                     .Include(b => b.SampleCollectionSchedules)
+                    .Include(b => b.User)
+                    .Include(b => b.Service)
                     .Where(b => b.UserId == id).ToListAsync();
             }
         }
@@ -52,6 +55,7 @@ namespace BDNAT_Repository.Implementation
                 return await context.Bookings
                     .Include(b => b.User)
                     .Include(b => b.Samples)
+                    .Include(b => b.Service)
                     .ToListAsync();
             }
         }
