@@ -52,6 +52,16 @@ namespace BDNAT_Repository.Implementation
             }
         }
 
+        public async Task<bool> UpdateRangeAsync(List<ResultDetail> resultDetails)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                context.ResultDetails.UpdateRange(resultDetails);
+                return await context.SaveChangesAsync() > 0;
+            }
+        }
+
+
         public async Task<bool> DeleteWhereAsync(Expression<Func<ResultDetail, bool>> predicate)
         {
             var resultDetails = await _context.ResultDetails

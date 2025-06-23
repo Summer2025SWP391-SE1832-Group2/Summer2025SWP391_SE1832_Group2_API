@@ -83,14 +83,14 @@ namespace BDNAT_Service.Implementation
                 transaction.Price = dataElement.GetProperty("amount").GetDecimal();
                 transaction.Description = dataElement.GetProperty("description").GetString();
                 transaction.TransactionCode = dataElement.GetProperty("reference").GetString();
-                transaction.Status = "SUCCESS";
+                transaction.Status = "Đã thanh toán";
                 transaction.UpdatedAt = DateTime.Parse(dataElement.GetProperty("transactionDateTime").GetString());
 
                 var updateTran = await UpdateTransactionAsync(transaction);
                 Console.WriteLine(updateTran ? "[INFO] Transaction updated successfully." : "[ERROR] Failed to update transaction.");
 
                 var booking = await BookingRepo.Instance.GetBookingByOrderCodeAsync(orderCode);
-                booking.PaymentStatus = "Paid";
+                booking.PaymentStatus = "Đã thanh toán";
                 var updatebooking = await BookingRepo.Instance.UpdateAsync(booking);
                 Console.WriteLine(updateTran ? "[INFO] Booking updated successfully." : "[ERROR] Failed to update booking.");
                 if (updateTran != true || updatebooking != true) { 

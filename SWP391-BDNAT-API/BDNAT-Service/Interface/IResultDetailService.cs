@@ -14,6 +14,7 @@ namespace BDNAT_Service.Interface
         Task<ResultDetailDTO> GetResultByIdAsync(int id);
         Task<bool> CreateResultAsync(ResultDetailDTO result);
         Task<bool> CreateMultipleResultsAsync(SaveResultDetailRequest dto);
+        Task<bool> UpdateMultipleResultsAsync(SaveResultDetailRequest dto);
         Task<bool> UpdateResultAsync(ResultDetailDTO result);
         Task<bool> DeleteResultAsync(int id);
         Task<List<ResultDetailDTO>> GetResultDetailsByBookingIdAsync(int BookingId);

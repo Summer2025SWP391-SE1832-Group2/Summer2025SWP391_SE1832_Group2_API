@@ -21,6 +21,8 @@ namespace BDNAT_Repository
 
             CreateMap<Booking, BookingDisplayDTO>().ReverseMap();
             CreateMap<Booking, BookingSampleDTO>().ReverseMap();
+            CreateMap<Booking, BookingScheduleDTO>().ReverseMap();
+            CreateMap<Booking, BookingDisplayDetailDTO>().ReverseMap();
 
             CreateMap<SampleCollectionSchedule, SampleCollectionScheduleDTO>().ReverseMap();
 
@@ -30,19 +32,23 @@ namespace BDNAT_Repository
             CreateMap<KitOrder, KitOrderDTO>().ReverseMap();
             CreateMap<Parameter, ParameterDTO>().ReverseMap();
             CreateMap<Rating, RatingDTO>().ReverseMap();
-            CreateMap<ResultDetail, ResultDetailDTO>().ReverseMap();
+            CreateMap<ResultDetail, ResultDetailDTO>()
+                .ForMember(dest => dest.ParameterName,opt => opt.MapFrom(src => src.TestParameter.Parameter.Name));
+
             CreateMap<Sample, SampleDTO>().ReverseMap();
             CreateMap<Service, ServiceDTO>().ReverseMap();
             CreateMap<ServiceType, ServiceTypeDTO>().ReverseMap();
             CreateMap<ShippingOrder, ShippingOrderDTO>().ReverseMap();
             CreateMap<TestKit, TestKitDTO>().ReverseMap();
             CreateMap<TestParameter, TestParameterDTO>().ReverseMap();
-            CreateMap<TestParameter, TestParameterAndValueDTO>().ReverseMap();
+            CreateMap<TestParameter, TestParameterResultDTO>().ReverseMap();
             CreateMap<Transaction, TransactionDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<User, RegisterRequest>().ReverseMap();
             CreateMap<SampleCollectionSchedule, SampleCollectionScheduleDTO>().ReverseMap();
             CreateMap<Team, TeamDTO>().ReverseMap();
+            CreateMap<WorkSchedule, WorkScheduleDTO>().ReverseMap();
+            CreateMap<UserWorkSchedule, UserWorkScheduleDTO>().ReverseMap();
         }
     }
 }

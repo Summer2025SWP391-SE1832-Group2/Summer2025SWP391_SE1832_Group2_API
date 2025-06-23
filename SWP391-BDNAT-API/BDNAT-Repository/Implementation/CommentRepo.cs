@@ -1,5 +1,6 @@
 ﻿using BDNAT_Repository.Entities;
 using BDNAT_Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,17 @@ namespace BDNAT_Repository.Implementation
                 }
                 return _instance;
             }
+        }
+
+        public async Task<List<Comment>> GetAllCommentsByBlogIdAsync(int blogId)
+        {
+            var comments = await _context.Comments
+                .Where(c => c.BlogId == blogId)
+                .Include(c => c.User)
+                .Include(c => c.Root)
+                .ToListAsync();
+
+            return comments;
         }
     }
 }

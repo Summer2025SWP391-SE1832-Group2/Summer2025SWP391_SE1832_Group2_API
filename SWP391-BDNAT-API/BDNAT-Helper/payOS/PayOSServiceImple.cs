@@ -29,7 +29,7 @@ namespace BDNAT_Helper.payOS
             // Tạo danh sách mặt hàng
             var items = new List<ItemData>
         {
-        new ItemData("NẠP TIỀN VÀO HỆ THỐNG", 1, (int)amount)
+        new ItemData("THANH TOÁN ĐƠN HÀNG", 1, (int)amount)
         };
 
             // Tạo mã giao dịch (orderCode)

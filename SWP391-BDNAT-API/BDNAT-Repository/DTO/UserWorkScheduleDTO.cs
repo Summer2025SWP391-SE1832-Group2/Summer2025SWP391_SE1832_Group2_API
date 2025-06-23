@@ -8,5 +8,12 @@ namespace BDNAT_Repository.DTO
 {
     public class UserWorkScheduleDTO
     {
+        public int UserWorkScheduleId { get; set; }
+
+        public int? UserId { get; set; }
+
+        public int? WorkScheduleId { get; set; }
+
+        public DateTime? Date { get; set; }
     }
 }

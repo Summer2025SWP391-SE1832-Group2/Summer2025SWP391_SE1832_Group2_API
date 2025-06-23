@@ -1,4 +1,5 @@
 ﻿using BDNAT_Repository.DTO;
+using BDNAT_Repository.Entities;
 using BDNAT_Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,12 @@ namespace SWP391_BDNAT_API.Controllers
     public class ResultDetailController : ControllerBase
     {
         private readonly IResultDetailService _resultService;
+        private readonly ITestParameterService _testParameterService;
 
-        public ResultDetailController(IResultDetailService resultService)
+        public ResultDetailController(IResultDetailService resultService, ITestParameterService testParameterService)
         {
             _resultService = resultService;
+            _testParameterService = testParameterService;
         }
 
         [HttpGet]
@@ -29,12 +32,12 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
-        [HttpGet("{id}/getAllResultByBookingId")]
-        public async Task<ActionResult<List<ResultDetailDTO>>> GetAllResultsByBookingID(int id)
+        [HttpGet("{bookingId}/getAllResultByBookingId")]
+        public async Task<ActionResult<List<ResultDetailDTO>>> GetAllResultsByBookingID(int bookingId)
         {
             try
             {
-                var list = await _resultService.GetResultDetailsByBookingIdAsync(id);
+                var list = await _testParameterService.GetResultWithParameterInfoAsync(bookingId);
                 return Ok(list);
             }
             catch (Exception ex)
@@ -67,9 +70,30 @@ namespace SWP391_BDNAT_API.Controllers
 
             var success = await _resultService.CreateMultipleResultsAsync(dto);
             if (success)
-                return Ok("Result details saved successfully.");
+                return Ok("Cập nhật kết quả thành công.");
 
-            return BadRequest("Failed to save result details.");
+            return BadRequest("Cập nhật thất bại. Vui lòng kiểm tra lại dữ liệu.");
+        }
+
+        [HttpPut("updateMultipleResults")]
+        public async Task<IActionResult> UpdateMultipleResults([FromBody] SaveResultDetailRequest dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var success = await _resultService.UpdateMultipleResultsAsync(dto);
+
+                if (success)
+                    return Ok(new { message = "Cập nhật kết quả thành công." });
+
+                return BadRequest(new { message = "Cập nhật thất bại. Vui lòng kiểm tra lại dữ liệu." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi hệ thống", detail = ex.Message });
+            }
         }
 
         [HttpPost("createResult")]

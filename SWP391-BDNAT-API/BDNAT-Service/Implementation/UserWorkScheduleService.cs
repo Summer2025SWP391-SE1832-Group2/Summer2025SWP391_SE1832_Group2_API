@@ -1,43 +1,66 @@
-﻿using BDNAT_Repository.DTO;
+﻿using AutoMapper;
+using BDNAT_Repository.DTO;
+using BDNAT_Repository.Entities;
+using BDNAT_Repository.Implementation;
 using BDNAT_Service.Interface;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BDNAT_Service.Implementation
 {
     public class UserWorkScheduleService : IUserWorkScheduleService
     {
-        public Task<bool> CreateListUserWorkScheduleAsync(List<UserWorkScheduleDTO> UserWorkSchedule)
+        private readonly IMapper _mapper;
+
+        public UserWorkScheduleService(IMapper mapper)
         {
-            throw new NotImplementedException();
+            _mapper = mapper;
         }
 
-        public Task<bool> CreateUserWorkScheduleAsync(UserWorkScheduleDTO UserWorkSchedule)
+        public async Task<bool> CreateListUserWorkScheduleAsync(List<UserWorkScheduleDTO> userWorkSchedules)
         {
-            throw new NotImplementedException();
+            var entities = _mapper.Map<List<UserWorkSchedule>>(userWorkSchedules);
+
+            foreach (var schedule in entities)
+            {
+                var success = await UserWorkScheduleRepo.Instance.InsertAsync(schedule);
+                if (!success)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        public Task<bool> DeleteUserWorkScheduleAsync(int id)
+        public async Task<bool> CreateUserWorkScheduleAsync(UserWorkScheduleDTO userWorkSchedule)
         {
-            throw new NotImplementedException();
+            var map = _mapper.Map<UserWorkSchedule>(userWorkSchedule);
+            return await UserWorkScheduleRepo.Instance.InsertAsync(map);
         }
 
-        public Task<List<UserWorkScheduleDTO>> GetAllUserWorkSchedulesAsync()
+        public async Task<bool> DeleteUserWorkScheduleAsync(int id)
         {
-            throw new NotImplementedException();
+            return await UserWorkScheduleRepo.Instance.DeleteAsync(id);
         }
 
-        public Task<UserWorkScheduleDTO> GetUserWorkScheduleByIdAsync(int id)
+        public async Task<List<UserWorkScheduleDTO>> GetAllUserWorkSchedulesAsync()
         {
-            throw new NotImplementedException();
+            var list = await UserWorkScheduleRepo.Instance.GetAllAsync();
+            return list.Select(x => _mapper.Map<UserWorkScheduleDTO>(x)).ToList();
         }
 
-        public Task<bool> UpdateUserWorkScheduleAsync(UserWorkScheduleDTO UserWorkSchedule)
+        public async Task<UserWorkScheduleDTO> GetUserWorkScheduleByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var entity = await UserWorkScheduleRepo.Instance.GetByIdAsync(id);
+            return _mapper.Map<UserWorkScheduleDTO>(entity);
+        }
+
+        public async Task<bool> UpdateUserWorkScheduleAsync(UserWorkScheduleDTO userWorkSchedule)
+        {
+            var map = _mapper.Map<UserWorkSchedule>(userWorkSchedule);
+            return await UserWorkScheduleRepo.Instance.UpdateAsync(map);
         }
     }
 }

@@ -58,8 +58,13 @@ namespace BDNAT_Service.Implementation
                 new Claim("UserId", user.UserId.ToString()),
                 new Claim("FullName", user.FullName),
                 new Claim("Email", user.Email),
-                new Claim("Role", user.Role)
+                new Claim("Role", user.Role),
             };
+
+            if (!string.IsNullOrEmpty(user.Address))
+            {
+                claims.Add(new Claim("Address", user.Address));
+            }
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("c2VydmVwZXJmZWN0bHljaGVlc2VxdWlja2NvYWNoY29sbGVjdHNsb3Bld2lzZWNhbWU="));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

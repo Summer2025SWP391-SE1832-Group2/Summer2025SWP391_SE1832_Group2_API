@@ -14,6 +14,10 @@ namespace BDNAT_Repository.DTO
 
         public int? TestParameterId { get; set; }
 
+        public string? ParameterName { get; set; }
+
+        public string? Description { get; set; }
+
         public string? Value { get; set; }
 
         public int? SampleId { get; set; }
@@ -22,6 +26,7 @@ namespace BDNAT_Repository.DTO
     public class SaveResultDetailRequest
     {
         public int BookingId { get; set; }
+        public string? FinalResult { get; set; }
         public List<ResultDetailDTO> Results { get; set; } = new();
     }
 }

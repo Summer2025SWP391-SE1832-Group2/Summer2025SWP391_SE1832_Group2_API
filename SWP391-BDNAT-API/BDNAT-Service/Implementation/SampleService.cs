@@ -40,7 +40,9 @@ namespace BDNAT_Service.Implementation
         public async Task<List<SampleWithCollectorDTO>> GetSampleByBookingIdAsync(int bookingId)
         {
             var samples = await SampleRepo.Instance.GetSamplesByBookingIdAsync(bookingId);
-
+            var updateBooking = await BookingRepo.Instance.GetById(bookingId);
+            updateBooking.Status = "Đã Lấy Mãu";
+            var check = await BookingRepo.Instance.UpdateAsync(updateBooking);
             var result = samples.Select(s => new SampleWithCollectorDTO
             {
                 SampleId = s.SampleId,

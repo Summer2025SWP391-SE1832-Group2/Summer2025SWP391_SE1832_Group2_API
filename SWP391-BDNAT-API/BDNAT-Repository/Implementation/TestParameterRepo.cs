@@ -25,13 +25,13 @@ namespace BDNAT_Repository.Implementation
             }
         }
 
-        public async Task<List<TestParameter>> GetTestParametersByServiceIdAsync(int ServiceId)
+        public async Task<List<TestParameter>> GetTestParametersByServiceIdAsync(int serviceId)
         {
             using (var context = new DnaTestingDbContext())
             {
                 return await context.TestParameters
-                    .Include(s => s.Parameter)
-                    .Where(s => s.ServiceId == ServiceId)
+                    .Include(tp => tp.Parameter)
+                    .Where(tp => tp.ServiceId == serviceId)
                     .ToListAsync();
             }
         }

@@ -14,5 +14,6 @@ namespace BDNAT_Service.Interface
         Task<bool> CreateCommentAsync(CommentDTO comment);
         Task<bool> UpdateCommentAsync(CommentDTO comment);
         Task<bool> DeleteCommentAsync(int id);
+        Task<List<CommentDTO>> GetCommentsByBlogId(int blogId);
     }
 }

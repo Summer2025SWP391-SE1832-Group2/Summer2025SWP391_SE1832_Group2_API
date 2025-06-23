@@ -6,35 +6,21 @@ namespace SWP391_BDNAT_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TestParameterController : ControllerBase
+    public class UserWorkScheduleController : ControllerBase
     {
-        private readonly ITestParameterService _testParameterService;
+        private readonly IUserWorkScheduleService _userWorkScheduleService;
 
-        public TestParameterController(ITestParameterService testParameterService)
+        public UserWorkScheduleController(IUserWorkScheduleService userWorkScheduleService)
         {
-            _testParameterService = testParameterService;
+            _userWorkScheduleService = userWorkScheduleService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<TestParameterDTO>>> GetAllTestParameters()
+        public async Task<ActionResult<List<UserWorkScheduleDTO>>> GetAll()
         {
             try
             {
-                var list = await _testParameterService.GetAllTestParametersAsync();
-                return Ok(list);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        [HttpGet("{bookingId}/getByBooking")]
-        public async Task<ActionResult<List<TestParameterResultDTO>>> GetParameterForm(int bookingId)
-        {
-            try
-            {
-                var list = await _testParameterService.GetTestParameterFormAsync(bookingId);    
+                var list = await _userWorkScheduleService.GetAllUserWorkSchedulesAsync();
                 return Ok(list);
             }
             catch (Exception ex)
@@ -44,13 +30,13 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<TestParameterDTO>> GetTestParameterById(int id)
+        public async Task<ActionResult<UserWorkScheduleDTO>> GetById(int id)
         {
             try
             {
-                var item = await _testParameterService.GetTestParameterByIdAsync(id);
+                var item = await _userWorkScheduleService.GetUserWorkScheduleByIdAsync(id);
                 if (item == null)
-                    return NotFound($"TestParameter with ID {id} not found");
+                    return NotFound($"UserWorkSchedule with ID {id} not found");
                 return Ok(item);
             }
             catch (Exception ex)
@@ -60,14 +46,31 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateTestParameter([FromBody] TestParameterDTO dto)
+        public async Task<ActionResult<bool>> Create([FromBody] UserWorkScheduleDTO dto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var result = await _testParameterService.CreateTestParameterAsync(dto);
+                var result = await _userWorkScheduleService.CreateUserWorkScheduleAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("create-list")]
+        public async Task<ActionResult<bool>> CreateList([FromBody] List<UserWorkScheduleDTO> dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var result = await _userWorkScheduleService.CreateListUserWorkScheduleAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -77,11 +80,11 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<bool>> UpdateTestParameter([FromBody] TestParameterDTO dto)
+        public async Task<ActionResult<bool>> Update([FromBody] UserWorkScheduleDTO dto)
         {
             try
             {
-                var result = await _testParameterService.UpdateTestParameterAsync(dto);
+                var result = await _userWorkScheduleService.UpdateUserWorkScheduleAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -91,11 +94,11 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<bool>> DeleteTestParameter(int id)
+        public async Task<ActionResult<bool>> Delete(int id)
         {
             try
             {
-                var result = await _testParameterService.DeleteTestParameterAsync(id);
+                var result = await _userWorkScheduleService.DeleteUserWorkScheduleAsync(id);
                 return Ok(result);
             }
             catch (Exception ex)

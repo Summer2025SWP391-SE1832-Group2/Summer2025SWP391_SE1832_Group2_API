@@ -84,7 +84,7 @@ namespace BDNAT_Service.Implementation
                 return new List<UserDTO>();
 
             // Parse start and end time from format "HH:mm:ss - HH:mm:ss"
-            var timeParts = schedule.Time.Split(" - ");
+            var timeParts = schedule.Time.Split("-");
             if (timeParts.Length != 2 ||
                 !TimeSpan.TryParse(timeParts[0], out var startTime) ||
                 !TimeSpan.TryParse(timeParts[1], out var endTime))
