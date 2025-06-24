@@ -46,6 +46,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ISampleCollectionScheduleService, SampleCollectionScheduleService>();
 builder.Services.AddScoped<IPayOSService, PayOSServiceImple>();
+builder.Services.AddScoped<ITeamService, TeamServices>();
+builder.Services.AddScoped<IWorkScheduleService, WorkScheduleService>();
+builder.Services.AddScoped<IUserWorkScheduleService, UserWorkScheduleService>();
 
 
 

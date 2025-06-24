@@ -29,12 +29,12 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
-        [HttpGet("{id}/getByService")]
-        public async Task<ActionResult<List<TestParameterDTO>>> GetAllTestParameterByServiceId(int id)
+        [HttpGet("{bookingId}/getByBooking")]
+        public async Task<ActionResult<List<TestParameterResultDTO>>> GetParameterForm(int bookingId)
         {
             try
             {
-                var list = await _testParameterService.GetTestParametersByServiceIdAsync(id);
+                var list = await _testParameterService.GetTestParameterFormAsync(bookingId);    
                 return Ok(list);
             }
             catch (Exception ex)

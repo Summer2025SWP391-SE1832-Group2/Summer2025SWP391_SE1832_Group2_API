@@ -69,7 +69,7 @@ public partial class DnaTestingDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=(local);Database= DNA_Testing_db;Uid=sa;Pwd=12345;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=(local);Database= DNA_Testing_db;Uid=sa;Pwd=admin12345;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -112,6 +112,8 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.BookingDate).HasColumnType("date");
+            entity.Property(e => e.DocumentsVerify).IsUnicode(false);
+            entity.Property(e => e.FinalResult).HasMaxLength(100);
             entity.Property(e => e.Method)
                 .HasMaxLength(20)
                 .IsUnicode(false);
@@ -129,7 +131,7 @@ public partial class DnaTestingDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Booking__UserID__5629CD9C");
+                .HasConstraintName("FK_Booking_Users");
         });
 
         modelBuilder.Entity<Comment>(entity =>
@@ -351,7 +353,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.ShipDate).HasColumnType("datetime");
             entity.Property(e => e.Status).HasColumnType("datetime");
-            entity.Property(e => e.ToAddress).HasMaxLength(50);
 
             entity.HasOne(d => d.Booking).WithMany(p => p.SampleShipments)
                 .HasForeignKey(d => d.BookingId)
@@ -360,7 +361,6 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.HasOne(d => d.CollectedByNavigation).WithMany(p => p.SampleShipments)
                 .HasForeignKey(d => d.CollectedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_SampleShipment_Users");
         });
 
@@ -484,9 +484,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.OrderCode)
-                .HasMaxLength(50)
-                .IsUnicode(false);
             entity.Property(e => e.PaymentGateway)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -500,7 +497,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
-                .IsUnicode(false)
                 .HasDefaultValueSql("('PENDING')");
             entity.Property(e => e.TransactionCode)
                 .HasMaxLength(100)
@@ -524,6 +520,7 @@ public partial class DnaTestingDbContext : DbContext
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC1196B26D");
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.Address).HasMaxLength(50);
             entity.Property(e => e.DateOfBirth).HasColumnType("date");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);

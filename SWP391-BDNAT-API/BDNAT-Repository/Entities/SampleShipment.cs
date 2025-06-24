@@ -11,17 +11,13 @@ public partial class SampleShipment
 
     public string Address { get; set; } = null!;
 
-    public int FromAddress { get; set; }
-
-    public string ToAddress { get; set; } = null!;
-
     public DateTime ShipDate { get; set; }
 
     public DateTime Status { get; set; }
 
-    public int CollectedBy { get; set; }
+    public int? CollectedBy { get; set; }
 
     public virtual Booking Booking { get; set; } = null!;
 
-    public virtual User CollectedByNavigation { get; set; } = null!;
+    public virtual User? CollectedByNavigation { get; set; }
 }

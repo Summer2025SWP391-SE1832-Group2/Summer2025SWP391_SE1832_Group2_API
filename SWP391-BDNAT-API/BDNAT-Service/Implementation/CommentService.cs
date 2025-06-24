@@ -47,5 +47,11 @@ namespace BDNAT_Service.Implementation
             var map = _mapper.Map<Comment>(comment);
             return await CommentRepo.Instance.UpdateAsync(map);
         }
+
+        public async Task<List<CommentDTO>> GetCommentsByBlogId(int blogId)
+        {
+            var list = await CommentRepo.Instance.GetAllCommentsByBlogIdAsync(blogId);
+            return list.Select(x => _mapper.Map<CommentDTO>(x)).ToList();
+        }
     }
 }

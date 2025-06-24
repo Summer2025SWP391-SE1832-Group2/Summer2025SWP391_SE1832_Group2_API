@@ -23,6 +23,12 @@ public partial class Booking
 
     public string Method { get; set; } = null!;
 
+    public string? DocumentsVerify { get; set; }
+
+    public long? OrderCode { get; set; }
+
+    public string? FinalResult { get; set; }
+
     public virtual ICollection<KitOrder> KitOrders { get; set; } = new List<KitOrder>();
 
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();

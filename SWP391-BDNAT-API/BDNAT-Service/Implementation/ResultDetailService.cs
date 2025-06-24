@@ -28,20 +28,63 @@ namespace BDNAT_Service.Implementation
 
         public async Task<bool> CreateMultipleResultsAsync(SaveResultDetailRequest dto)
         {
-            if (dto.Results == null || !dto.Results.Any())
+            var updateBooking = await BookingRepo.Instance.GetById(dto.BookingId);
+            updateBooking.FinalResult = dto.FinalResult;
+            updateBooking.Status = "Hoàn thành";
+            var check = await BookingRepo. Instance.UpdateAsync(updateBooking);
+            if (check)
+            {
+                if (dto.Results == null || !dto.Results.Any())
+                    return false;
+
+                var resultEntities = dto.Results.Select(r => new ResultDetail
+                {
+                    BookingId = dto.BookingId,
+                    TestParameterId = r.TestParameterId ?? 0,
+                    Value = r.Value,
+                    SampleId = r.SampleId ?? 0
+                }).ToList();
+
+                await ResultDetailRepo.Instance.AddRangeAsync(resultEntities);
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> UpdateMultipleResultsAsync(SaveResultDetailRequest dto)
+        {
+            if (dto == null || dto.BookingId == 0 || dto.Results == null || !dto.Results.Any())
                 return false;
 
-            var resultEntities = dto.Results.Select(r => new ResultDetail
-            {
-                BookingId = dto.BookingId,
-                TestParameterId = r.TestParameterId??0,
-                Value = r.Value,
-                SampleId = r.SampleId??0
-            }).ToList();
+            // Lấy danh sách result hiện tại trong DB
+            var existingResults = await ResultDetailRepo.Instance.GetResultDetailsByBookingIdAsync(dto.BookingId);
 
-            await ResultDetailRepo.Instance.AddRangeAsync(resultEntities);
-            return true;
+            foreach (var updateItem in dto.Results)
+            {
+                var result = existingResults.FirstOrDefault(r => r.ResultDetailId == updateItem.ResultDetailId);
+                if (result != null)
+                {
+                    result.Value = updateItem.Value;
+                    result.TestParameterId = updateItem.TestParameterId ?? result.TestParameterId;
+                    result.SampleId = updateItem.SampleId ?? result.SampleId;
+                }
+            }
+
+            // Cập nhật batch
+            var updated = await ResultDetailRepo.Instance.UpdateRangeAsync(existingResults);
+            if (!updated)
+                return false;
+
+            // Cập nhật Booking
+            var booking = await BookingRepo.Instance.GetById(dto.BookingId);
+            if (booking == null) return false;
+
+            booking.FinalResult = dto.FinalResult;
+            booking.Status = "Hoàn thành";
+
+            return await BookingRepo.Instance.UpdateAsync(booking);
         }
+
 
         public async Task<bool> DeleteResultAsync(int id)
         {

@@ -9,6 +9,6 @@ namespace BDNAT_Helper.payOS
 {
     public interface IPayOSService
     {
-        public Task<string> RequestWithPayOsAsync(Booking order, decimal amount);
+        public Task<string> RequestWithPayOsAsync(Booking order, decimal amount,long orderCode);
     }
 }

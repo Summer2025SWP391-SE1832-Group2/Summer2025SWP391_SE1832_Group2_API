@@ -18,7 +18,7 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<BookingDTO>>> GetAllBookings()
+        public async Task<ActionResult<List<BookingDisplayDTO>>> GetAllBookings()
         {
             try
             {
@@ -44,6 +44,21 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("/checkPending")]
+        public async Task<ActionResult<bool>> CheckPending(int userId)
+        {
+            try
+            {
+                var hasPending = await _bookingService.CheckPending(userId);
+                return Ok(hasPending);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
         [HttpGet("/BookingWithSample")]
         public async Task<ActionResult<List<BookingSampleDTO>>> GetAllBookingWithSample()
         {
@@ -59,7 +74,7 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<BookingDTO>> GetBookingById(int id)
+        public async Task<ActionResult<BookingDisplayDetailDTO>> GetBookingById(int id)
         {
             try
             {
@@ -74,7 +89,7 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
         [HttpGet("{UserId}/getByUserId")]
-        public async Task<ActionResult<List<BookingDTO>>> GetBookingByUserId(int UserId)
+        public async Task<ActionResult<List<BookingDisplayDTO>>> GetBookingByUserId(int UserId)
         {
             try
             {
@@ -90,24 +105,40 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateBooking([FromBody] BookingDTO dto)
+        public async Task<ActionResult<string>> CreateBooking([FromBody] BookingRequestDTO dto)
         {
             try
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
+                    return BadRequest(new
+                    {
+                        message = "Dữ liệu không hợp lệ",
+                        errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                    });
 
                 var result = await _bookingService.CreateBookingAsync(dto);
+
+                if (string.IsNullOrEmpty(result))
+                {
+                    return StatusCode(500, new { message = "Không thể tạo đơn hàng. Vui lòng thử lại." });
+                }
+
                 return Created("Create Booking Successfully!", result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Lỗi trùng lịch hoặc logic nghiệp vụ
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                // Lỗi không xác định
+                return StatusCode(500, new { message = "Lỗi hệ thống", detail = ex.Message });
             }
         }
 
         [HttpPut]
-        public async Task<ActionResult<bool>> UpdateBooking([FromBody] BookingDTO dto)
+        public async Task<ActionResult<bool>> UpdateBooking([FromBody] BookingRequestDTO dto)
         {
             try
             {
@@ -131,6 +162,23 @@ namespace SWP391_BDNAT_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("regenerate-qr/{bookingId}")]
+        public async Task<IActionResult> RegenerateQr(int bookingId)
+        {
+            try
+            {
+                var paymentUrl = await _bookingService.RegeneratePaymentQrAsync(bookingId);
+                if (string.IsNullOrEmpty(paymentUrl))
+                    return BadRequest("Không thể tạo lại mã thanh toán.");
+
+                return Ok(new { paymentUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
             }
         }
 

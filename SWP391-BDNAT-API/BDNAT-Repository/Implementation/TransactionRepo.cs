@@ -25,7 +25,7 @@ namespace BDNAT_Repository.Implementation
             }
         }
 
-        public async Task<Transaction> GetByOrderCodeAsync(string orderCode)
+        public async Task<Transaction> GetByOrderCodeAsync(long orderCode)
         {
             return await _context.Transactions.FirstOrDefaultAsync(t => t.OrderCode == orderCode);
         }

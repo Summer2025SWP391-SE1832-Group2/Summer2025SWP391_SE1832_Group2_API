@@ -23,6 +23,8 @@ public partial class User
 
     public string? IdentityNumber { get; set; }
 
+    public string? Address { get; set; }
+
     public virtual ICollection<Blog> Blogs { get; set; } = new List<Blog>();
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();

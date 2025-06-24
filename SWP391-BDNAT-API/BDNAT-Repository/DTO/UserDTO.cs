@@ -23,5 +23,9 @@ namespace BDNAT_Repository.DTO
         public string? Gender { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
+
+        public string? IdentityNumber { get; set; }
+
+        public string? Address { get; set; }
     }
 }

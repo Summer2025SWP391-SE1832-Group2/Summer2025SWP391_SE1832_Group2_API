@@ -89,5 +89,12 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("blog/{blogId}")]
+        public async Task<IActionResult> GetCommentsByBlogId(int blogId)
+        {
+            var comments = await _commentService.GetCommentsByBlogId(blogId);
+            return Ok(comments);
+        }
     }
 }

@@ -9,15 +9,15 @@ namespace BDNAT_Service.Interface
 {
     public interface IBookingService
     {
-        Task<List<BookingDTO>> GetAllBookingsAsync();
+        Task<List<BookingDisplayDTO>> GetAllBookingsAsync();
+        Task<bool> CheckPending(int uid);
         Task<List<BookingScheduleDTO>> GetAllBookingWithScheduleAsync();
         Task<List<BookingSampleDTO>> GetAllBookingWithSampleAsync();
-
-        Task<BookingDTO> GetBookingByIdAsync(int id);
-        Task<List<BookingDTO>> GetBookingByUserIdAsync(int id);
-
-        Task<string> CreateBookingAsync(BookingDTO booking);
-        Task<bool> UpdateBookingAsync(BookingDTO booking);
+        Task<BookingDisplayDetailDTO> GetBookingByIdAsync(int id);
+        Task<List<BookingDisplayDTO>> GetBookingByUserIdAsync(int id);
+        Task<string> CreateBookingAsync(BookingRequestDTO booking);
+        Task<bool> UpdateBookingAsync(BookingRequestDTO booking);
         Task<bool> DeleteBookingAsync(int id);
+        Task<string?> RegeneratePaymentQrAsync(int bookingId);
     }
 }

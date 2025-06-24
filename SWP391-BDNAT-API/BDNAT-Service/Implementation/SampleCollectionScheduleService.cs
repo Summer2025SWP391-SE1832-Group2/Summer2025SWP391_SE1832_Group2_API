@@ -83,37 +83,52 @@ namespace BDNAT_Service.Implementation
             if (schedule == null || string.IsNullOrEmpty(schedule.Time))
                 return new List<UserDTO>();
 
-            if (!TimeSpan.TryParse(schedule.Time, out var collectionTime))
+            // Parse start and end time from format "HH:mm:ss - HH:mm:ss"
+            var timeParts = schedule.Time.Split("-");
+            if (timeParts.Length != 2 ||
+                !TimeSpan.TryParse(timeParts[0], out var startTime) ||
+                !TimeSpan.TryParse(timeParts[1], out var endTime))
+            {
                 return new List<UserDTO>();
+            }
 
             var workSchedules = await WorkScheduleRepo.Instance.GetAllAsync();
-            var matchedWorkSchedule = workSchedules.FirstOrDefault(ws =>
-                ws.StartTime.HasValue && ws.EndTime.HasValue &&
-                collectionTime >= ws.StartTime.Value &&
-                collectionTime <= ws.EndTime.Value);
+
+            // Only consider schedules where both StartTime and EndTime exist
+            var validSchedules = workSchedules
+                .Where(ws => ws.StartTime.HasValue && ws.EndTime.HasValue)
+                .ToList();
+
+            // Find matching work schedule that fully covers the booking time range
+            var matchedWorkSchedule = validSchedules.FirstOrDefault(ws =>
+                ws.StartTime.Value <= startTime &&
+                ws.EndTime.Value >= endTime);
 
             if (matchedWorkSchedule == null)
                 return new List<UserDTO>();
 
             var userWorkSchedules = await UserWorkScheduleRepo.Instance.GetAllAsync();
+
+            // Get staff with matching work schedule and correct date
             var validUserIds = userWorkSchedules
-                .Where(u => u.WorkScheduleId == matchedWorkSchedule.WorkScheduleId &&
-                            u.Date.HasValue &&
-                            u.Date.Value.Date == schedule.CollectionDate.Date &&
-                            u.UserId.HasValue)
-                .Select(u => u.UserId.Value)
+                .Where(uws =>
+                    uws.WorkScheduleId == matchedWorkSchedule.WorkScheduleId &&
+                    uws.Date.HasValue &&
+                    uws.Date.Value.Date == schedule.CollectionDate.Date &&
+                    uws.UserId.HasValue)
+                .Select(uws => uws.UserId.Value)
                 .ToList();
 
             var allUsers = await UserRepo.Instance.GetAllAsync();
+
             var availableStaff = allUsers
                 .Where(u => validUserIds.Contains(u.UserId) &&
                             u.Role?.ToLower() == "staff")
                 .ToList();
 
-            var mapped = _mapper.Map<List<UserDTO>>(availableStaff);
-            return mapped;
+            return _mapper.Map<List<UserDTO>>(availableStaff);
         }
-    
+
         public async Task<bool> UpdateScheduleStatusAsync(int id, string status)
         {
             var schedule = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(id);

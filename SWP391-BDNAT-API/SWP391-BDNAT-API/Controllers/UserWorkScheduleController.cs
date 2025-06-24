@@ -6,21 +6,21 @@ namespace SWP391_BDNAT_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SampleController : ControllerBase
+    public class UserWorkScheduleController : ControllerBase
     {
-        private readonly ISampleService _sampleService;
+        private readonly IUserWorkScheduleService _userWorkScheduleService;
 
-        public SampleController(ISampleService sampleService)
+        public UserWorkScheduleController(IUserWorkScheduleService userWorkScheduleService)
         {
-            _sampleService = sampleService;
+            _userWorkScheduleService = userWorkScheduleService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<SampleDTO>>> GetAllSamples()
+        public async Task<ActionResult<List<UserWorkScheduleDTO>>> GetAll()
         {
             try
             {
-                var list = await _sampleService.GetAllSamplesAsync();
+                var list = await _userWorkScheduleService.GetAllUserWorkSchedulesAsync();
                 return Ok(list);
             }
             catch (Exception ex)
@@ -30,13 +30,13 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<SampleDTO>> GetSampleById(int id)
+        public async Task<ActionResult<UserWorkScheduleDTO>> GetById(int id)
         {
             try
             {
-                var item = await _sampleService.GetSampleByIdAsync(id);
+                var item = await _userWorkScheduleService.GetUserWorkScheduleByIdAsync(id);
                 if (item == null)
-                    return NotFound($"Sample with ID {id} not found");
+                    return NotFound($"UserWorkSchedule with ID {id} not found");
                 return Ok(item);
             }
             catch (Exception ex)
@@ -44,30 +44,33 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpGet("by-booking-id/{id}")]
-        public async Task<ActionResult<List<SampleWithCollectorDTO>>> GetSampleByBookingId(int id)
-        {
-            try
-            {
-                var item = await _sampleService.GetSampleByBookingIdAsync(id);
-                if (item == null)
-                    return NotFound($"Sample with ID {id} not found");
-                return Ok(item);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateSample([FromBody] SampleDTO dto)
+        public async Task<ActionResult<bool>> Create([FromBody] UserWorkScheduleDTO dto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var result = await _sampleService.CreateSampleAsync(dto);
+                var result = await _userWorkScheduleService.CreateUserWorkScheduleAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("create-list")]
+        public async Task<ActionResult<bool>> CreateList([FromBody] List<UserWorkScheduleDTO> dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var result = await _userWorkScheduleService.CreateListUserWorkScheduleAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -77,11 +80,11 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<bool>> UpdateSample([FromBody] SampleDTO dto)
+        public async Task<ActionResult<bool>> Update([FromBody] UserWorkScheduleDTO dto)
         {
             try
             {
-                var result = await _sampleService.UpdateSampleAsync(dto);
+                var result = await _userWorkScheduleService.UpdateUserWorkScheduleAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -91,11 +94,11 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<bool>> DeleteSample(int id)
+        public async Task<ActionResult<bool>> Delete(int id)
         {
             try
             {
-                var result = await _sampleService.DeleteSampleAsync(id);
+                var result = await _userWorkScheduleService.DeleteUserWorkScheduleAsync(id);
                 return Ok(result);
             }
             catch (Exception ex)
