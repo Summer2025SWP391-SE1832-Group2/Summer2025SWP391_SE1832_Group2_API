@@ -48,6 +48,22 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("{UserId}/getByUserId")]
+        public async Task<ActionResult<List<BookingDisplayDTO>>> GettTransactionByUserId(int UserId)
+        {
+            try
+            {
+                var item = await _transactionService.GetTransactionByUserIdAsync(UserId);
+                if (item == null)
+                    return NotFound($"Booking with ID {UserId} not found");
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<bool>> CreateTransaction([FromBody] TransactionDTO dto)
         {

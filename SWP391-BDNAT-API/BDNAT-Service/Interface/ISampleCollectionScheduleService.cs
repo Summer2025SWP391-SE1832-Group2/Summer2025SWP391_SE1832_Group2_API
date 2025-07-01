@@ -18,7 +18,7 @@ namespace BDNAT_Service.Interface
         Task<bool> CreateSampleCollectionScheduleAsync(SampleCollectionScheduleDTO SampleCollectionSchedule);
         Task<bool> UpdateSampleCollectionScheduleAsync(SampleCollectionScheduleDTO SampleCollectionSchedule);
         Task<bool> DeleteSampleCollectionScheduleAsync(int id);
-        Task<List<UserDTO>> GetAvailableStaffForSchedule(int scheduleId);
+        Task<List<UserDTO>> GetAvailableStaffForBooking(int bookingId);
         Task<bool> UpdateScheduleStatusAsync(int id, string status);
         Task<SampleCollectionScheduleDTO> GetScheduleByBookingIdAsync(int bookingId);
         Task<List<SampleCollectionScheduleDTO>> GetSchedulesByCollectorIdAsync(int collectorId);

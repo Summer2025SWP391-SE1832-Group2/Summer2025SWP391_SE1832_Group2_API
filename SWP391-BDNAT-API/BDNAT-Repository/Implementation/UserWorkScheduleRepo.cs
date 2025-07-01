@@ -1,5 +1,6 @@
 ﻿using BDNAT_Repository.Entities;
 using BDNAT_Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,15 @@ namespace BDNAT_Repository.Implementation
                 }
                 return _instance;
             }
+        }
+
+        public async Task<List<UserWorkSchedule>> GetUserWorkSchedulesByUserIdAsync(int userId)
+        {
+            using var context = new DnaTestingDbContext();
+            return await context.UserWorkSchedules
+                .Include(uws => uws.WorkSchedule)
+                .Where(uws => uws.UserId == userId)
+                .ToListAsync();
         }
     }
 }

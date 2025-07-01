@@ -32,10 +32,10 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
-        [HttpGet("{scheduleId}/available-staffs")]
-        public async Task<IActionResult> GetAvailableStaffs(int scheduleId)
+        [HttpGet("{bookingId}/available-staffs")]
+        public async Task<IActionResult> GetAvailableStaffs(int bookingId)
         {
-            var staffs = await _scheduleService.GetAvailableStaffForSchedule(scheduleId);
+            var staffs = await _scheduleService.GetAvailableStaffForBooking(bookingId);
             return Ok(staffs);
         }
 

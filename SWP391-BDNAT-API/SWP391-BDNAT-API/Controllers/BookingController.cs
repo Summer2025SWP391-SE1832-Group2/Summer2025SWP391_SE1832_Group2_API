@@ -104,6 +104,20 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("by-collector/{collectorId}")]
+        public async Task<IActionResult> GetBookingsByCollector(int collectorId)
+        {
+            try
+            {
+                var bookings = await _bookingService.GetBookingsByCollectorAsync(collectorId);
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lấy danh sách booking", detail = ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<string>> CreateBooking([FromBody] BookingRequestDTO dto)
         {

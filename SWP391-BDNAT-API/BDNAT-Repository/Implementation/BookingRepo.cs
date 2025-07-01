@@ -31,7 +31,9 @@ namespace BDNAT_Repository.Implementation
             using (var context = new DnaTestingDbContext())
             {
                 return await context.Bookings
+                    .Include(b => b.User) // User đặt lịch
                     .Include(b => b.SampleCollectionSchedules)
+                        .ThenInclude(s => s.Collector) // Nhân viên thu mẫu
                     .ToListAsync();
             }
         }
@@ -92,7 +94,8 @@ namespace BDNAT_Repository.Implementation
                                 TestParameterId = r.TestParameterId,
                                 Value = r.Value,
                                 ParameterName = r.TestParameter.Parameter.Name,
-                                Description = r.TestParameter.Parameter.Description
+                                Description = r.TestParameter.Parameter.Description,
+                                SampleOwnerName = r.Sample.ParticipantName
                             }).ToList()
                     })
                     .FirstOrDefaultAsync();
@@ -122,7 +125,7 @@ namespace BDNAT_Repository.Implementation
             }
         }
 
-        public async Task<bool> IsScheduleDuplicatedAsync(DateTime collectionDate, string time, string location)
+        public async Task<bool> IsScheduleDuplicatedAsync(DateTime collectionDate, string time, string location, int userId)
         {
             using (var context = new DnaTestingDbContext())
             {
@@ -130,7 +133,22 @@ namespace BDNAT_Repository.Implementation
                     .AnyAsync(s =>
                         s.CollectionDate.Date == collectionDate.Date &&
                         s.Time == time &&
-                        s.Location == location);
+                        s.Location == location &&
+                        s.Booking.UserId == userId // chỉ check lịch của chính user
+                    );
+            }
+        }
+
+        public async Task<List<Booking>> GetBookingsByCollectorIdAsync(int collectorId)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                return await context.Bookings
+                    .Include(b => b.User)
+                    .Include(b => b.SampleCollectionSchedules.Where(s => s.CollectorId == collectorId))
+                        .ThenInclude(s => s.Collector)
+                    .Where(b => b.SampleCollectionSchedules.Any(s => s.CollectorId == collectorId))
+                    .ToListAsync();
             }
         }
 

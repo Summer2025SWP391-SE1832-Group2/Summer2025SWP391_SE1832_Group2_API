@@ -85,7 +85,7 @@ namespace BDNAT_Service.Implementation
                 transaction.TransactionCode = dataElement.GetProperty("reference").GetString();
                 transaction.Status = "Đã thanh toán";
                 transaction.UpdatedAt = DateTime.Parse(dataElement.GetProperty("transactionDateTime").GetString());
-
+                transaction.PaymentMethod = "Banking";
                 var updateTran = await UpdateTransactionAsync(transaction);
                 Console.WriteLine(updateTran ? "[INFO] Transaction updated successfully." : "[ERROR] Failed to update transaction.");
 
@@ -106,6 +106,11 @@ namespace BDNAT_Service.Implementation
             }
         }
 
+        public async Task<List<TransactionDTO>> GetTransactionByUserIdAsync(int Uid)
+        {
+            var list = await TransactionRepo.Instance.GetTransactionByUserIdAsync(Uid);
+            return list.Select(x => _mapper.Map<TransactionDTO>(x)).ToList();
+        }
     }
 
 }

@@ -33,67 +33,61 @@ namespace BDNAT_Service.Implementation
 
         public async Task<string?> CreateBookingAsync(BookingRequestDTO bookingDto)
         {
+            // 1. Kiểm tra trùng lịch
             bool isDuplicate = await BookingRepo.Instance.IsScheduleDuplicatedAsync(
                 bookingDto.CollectionDate,
                 bookingDto.Time,
-                bookingDto.Location
+                bookingDto.Location,
+                bookingDto.UserId
             );
 
             if (isDuplicate)
-            {
                 throw new InvalidOperationException("Lịch hẹn bị trùng. Vui lòng chọn thời gian khác.");
-            }
 
-            // Map booking
+            // 2. Kiểm tra đã có booking "Đang chờ xử lý"
+            var bookings = await BookingRepo.Instance.GetBookingByUserIdAsync(bookingDto.UserId);
+            bool hasPending = bookings.Any(b => b.Status == "Đang chờ xử lý");
+
+            // 3. Map booking & tính toán
             var booking = _mapper.Map<Booking>(bookingDto);
             booking.BookingDate = DateTime.Now;
             var service = await ServiceRepo.Instance.GetByIdAsync(bookingDto.ServiceId);
             booking.PreferredDate = bookingDto.CollectionDate.AddDays((double)service.DurationDays);
             long orderCode = long.Parse(DateTimeOffset.Now.ToString("yyMMddHHmmss"));
-            //Update OrderCode of Booking
             booking.OrderCode = orderCode;
+            booking.Status = "Đang chờ xử lý";
             booking.PaymentStatus = "Chưa thanh toán";
-            // Insert booking
-            var bookingCreated = await BookingRepo.Instance.InsertAsync(booking);
-            if (!bookingCreated)
-                return null;
 
-            // Insert schedule
+            // 4. Insert Booking
+            var bookingCreated = await BookingRepo.Instance.InsertAsync(booking);
+            if (!bookingCreated) return null;
+
+            // 5. Insert Schedule
             var schedule = new SampleCollectionSchedule
             {
                 BookingId = booking.BookingId,
                 CollectionDate = bookingDto.CollectionDate,
                 Time = bookingDto.Time,
                 Location = bookingDto.Location,
-                Status = "Đang chờ"
+                Status = "Pending"
             };
-
             var scheduleCreated = await SampleCollectionScheduleRepo.Instance.InsertAsync(schedule);
-            if (!scheduleCreated)
-                return null;
-            decimal amount = 0;
-            if (bookingDto.Method.Equals("Delivery"))
-            {
+            if (!scheduleCreated) return null;
+
+            // 6. Tính tiền
+            decimal amount;
+            if (bookingDto.Method == "Delivery")
                 amount = (decimal)(service.Price + 3000);
-            }
-            else if (booking.Method.Equals("SupportAtHome"))
-            {
-                amount = (decimal)(service.Price + 3000 + ((decimal)service.Price * 0.2m));
-            }
+            else if (bookingDto.Method == "SupportAtHome")
+                amount = (decimal)(service.Price + 3000 + (service.Price * 0.2m));
             else
-            {
-                amount = (decimal)(service.Price);
-            }
+                amount = (decimal)service.Price;
 
-            
-            var paymentUrl = await _payOSService.RequestWithPayOsAsync(booking, amount,orderCode);
+            // 7. Tạo payment
+            var paymentUrl = await _payOSService.RequestWithPayOsAsync(booking, amount, orderCode);
+            if (string.IsNullOrEmpty(paymentUrl)) return null;
 
-            // Kiểm tra nếu không có paymentUrl thì dừng lại
-            if (string.IsNullOrEmpty(paymentUrl))
-                return null;
-
-            // BƯỚC 5: Tạo Transaction nếu có paymentUrl
-            
+            // 8. Ghi transaction
             var transaction = new Transaction
             {
                 BookingId = booking.BookingId,
@@ -102,13 +96,13 @@ namespace BDNAT_Service.Implementation
                 Price = amount,
                 OrderCode = orderCode,
                 PaymentGateway = "PayOS",
-                Status = "Đang chờ",
+                Status = "Chưa thanh toán",
                 PaymentUrl = paymentUrl,
                 CreatedAt = DateTime.Now
             };
             await TransactionRepo.Instance.InsertAsync(transaction);
 
-            // Trả về link thanh toán
+            // 9. Trả kết quả
             return paymentUrl;
         }
 
@@ -163,7 +157,7 @@ namespace BDNAT_Service.Implementation
                 Price = amount,
                 OrderCode = orderCode,
                 PaymentGateway = "PayOS",
-                Status = "Đang chờ",
+                Status = "Chưa thanh toán",
                 PaymentUrl = paymentUrl,
                 CreatedAt = DateTime.Now
             };
@@ -181,8 +175,27 @@ namespace BDNAT_Service.Implementation
 
         public async Task<List<BookingDisplayDTO>> GetAllBookingsAsync()
         {
-            var list = await BookingRepo.Instance.GetAllAsync();
-            return list.Select(x => _mapper.Map<BookingDisplayDTO>(x)).ToList();
+            var list = await BookingRepo.Instance.GetAllBookingWithSchedule();
+            var result = list.Select(x =>
+            {
+                var schedule = x.SampleCollectionSchedules?.FirstOrDefault();
+
+                return new BookingDisplayDTO
+                {
+                    BookingId = x.BookingId,
+                    UserId = x.UserId,
+                    BookingDate = x.BookingDate,
+                    Status = x.Status,
+                    PaymentStatus = x.PaymentStatus,
+                    PreferredDate = x.PreferredDate,
+                    Method = x.Method,
+                    CollectionDate = schedule?.CollectionDate,
+                    Time = schedule?.Time,
+                    Location = schedule?.Location ?? ""
+                };
+            }).ToList();
+
+            return result;
         }
 
         public async Task<List<BookingSampleDTO>> GetAllBookingWithSampleAsync()
@@ -193,8 +206,32 @@ namespace BDNAT_Service.Implementation
 
         public async Task<List<BookingScheduleDTO>> GetAllBookingWithScheduleAsync()
         {
-            var list = await BookingRepo.Instance.GetAllBookingWithSchedule();
-            return list.Select(x => _mapper.Map<BookingScheduleDTO>(x)).ToList();
+            var data = await BookingRepo.Instance.GetAllBookingWithSchedule();
+
+            var result = data.Select(b => new BookingScheduleDTO
+            {
+                BookingId = b.BookingId,
+                UserId = b.UserId,
+                FullName = b.User?.FullName,
+                BookingDate = b.BookingDate,
+                Status = b.Status,
+                PaymentStatus = b.PaymentStatus,
+                PreferredDate = b.PreferredDate,
+                Method = b.Method,
+                SampleCollectionSchedules = b.SampleCollectionSchedules?.Select(s => new SampleCollectionScheduleDTO
+                {
+                    ScheduleId = s.ScheduleId,
+                    BookingId = s.BookingId,
+                    CollectorId = s.CollectorId,
+                    CollectorName = s.Collector?.FullName,
+                    CollectionDate = s.CollectionDate,
+                    Time = s.Time,
+                    Location = s.Location,
+                    Status = s.Status
+                }).ToList()
+            }).ToList();
+
+            return result;
         }
 
         public async Task<BookingDisplayDetailDTO?> GetBookingByIdAsync(int id)
@@ -237,6 +274,36 @@ namespace BDNAT_Service.Implementation
             var map = _mapper.Map<Booking>(booking);
             return await BookingRepo.Instance.UpdateAsync(map);
         }
-    }
 
+        public async Task<List<BookingScheduleDTO>> GetBookingsByCollectorAsync(int collectorId)
+        {
+            var bookings = await BookingRepo.Instance.GetBookingsByCollectorIdAsync(collectorId);
+
+            var result = bookings.Select(b => new BookingScheduleDTO
+            {
+                BookingId = b.BookingId,
+                UserId = b.UserId,
+                FullName = b.User?.FullName,
+                BookingDate = b.BookingDate,
+                Status = b.Status,
+                PaymentStatus = b.PaymentStatus,
+                PreferredDate = b.PreferredDate,
+                Method = b.Method,
+                SampleCollectionSchedules = b.SampleCollectionSchedules?.Select(s => new SampleCollectionScheduleDTO
+                {
+                    ScheduleId = s.ScheduleId,
+                    BookingId = s.BookingId,
+                    CollectorId = s.CollectorId,
+                    CollectorName = s.Collector?.FullName,
+                    CollectionDate = s.CollectionDate,
+                    Time = s.Time,
+                    Location = s.Location,
+                    Status = s.Status
+                }).ToList()
+            }).ToList();
+
+            return result;
+        }
+
+    }
 }

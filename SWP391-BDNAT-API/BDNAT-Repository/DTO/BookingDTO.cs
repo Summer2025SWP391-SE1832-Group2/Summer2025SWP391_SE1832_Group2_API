@@ -12,7 +12,7 @@ namespace BDNAT_Repository.DTO
 
         public int? ServiceId { get; set; }
 
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
 
         public DateTime? BookingDate { get; set; }
         public string? Status { get; set; }
@@ -91,6 +91,7 @@ namespace BDNAT_Repository.DTO
         public int BookingId { get; set; }
 
         public int? UserId { get; set; }
+        public string? FullName { get; set; }
 
         public DateTime? BookingDate { get; set; }
 

@@ -41,7 +41,7 @@ namespace BDNAT_Service.Implementation
         {
             var samples = await SampleRepo.Instance.GetSamplesByBookingIdAsync(bookingId);
             var updateBooking = await BookingRepo.Instance.GetById(bookingId);
-            updateBooking.Status = "Đã Lấy Mãu";
+            updateBooking.Status = "Đã lấy mẫu";
             var check = await BookingRepo.Instance.UpdateAsync(updateBooking);
             var result = samples.Select(s => new SampleWithCollectorDTO
             {

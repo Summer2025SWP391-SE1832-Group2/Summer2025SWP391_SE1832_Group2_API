@@ -13,7 +13,7 @@ namespace BDNAT_Repository.DTO
         public int BookingId { get; set; }
 
         public int? CollectorId { get; set; }
-
+        public string? CollectorName { get; set; }
         public DateTime CollectionDate { get; set; }
 
         public string? Time { get; set; }

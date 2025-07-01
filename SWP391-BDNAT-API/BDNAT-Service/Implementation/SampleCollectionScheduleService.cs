@@ -77,29 +77,32 @@ namespace BDNAT_Service.Implementation
             return list.Select(x => _mapper.Map<SampleCollectionScheduleDTO>(x)).ToList();
         }
 
-        public async Task<List<UserDTO>> GetAvailableStaffForSchedule(int scheduleId)
+        public async Task<List<UserDTO>> GetAvailableStaffForBooking(int bookingId)
         {
-            var schedule = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(scheduleId);
+            var schedule = (await SampleCollectionScheduleRepo.Instance.GetAllAsync())
+                .Where(s => s.BookingId == bookingId)
+                .OrderByDescending(s => s.CollectionDate)
+                .FirstOrDefault();
+
+
             if (schedule == null || string.IsNullOrEmpty(schedule.Time))
                 return new List<UserDTO>();
 
-            // Parse start and end time from format "HH:mm:ss - HH:mm:ss"
-            var timeParts = schedule.Time.Split("-");
+            // Parse "HH:mm:ss - HH:mm:ss" format
+            var timeParts = schedule.Time.Split('-');
             if (timeParts.Length != 2 ||
-                !TimeSpan.TryParse(timeParts[0], out var startTime) ||
-                !TimeSpan.TryParse(timeParts[1], out var endTime))
+                !TimeSpan.TryParse(timeParts[0].Trim(), out var startTime) ||
+                !TimeSpan.TryParse(timeParts[1].Trim(), out var endTime))
             {
                 return new List<UserDTO>();
             }
 
             var workSchedules = await WorkScheduleRepo.Instance.GetAllAsync();
 
-            // Only consider schedules where both StartTime and EndTime exist
             var validSchedules = workSchedules
                 .Where(ws => ws.StartTime.HasValue && ws.EndTime.HasValue)
                 .ToList();
 
-            // Find matching work schedule that fully covers the booking time range
             var matchedWorkSchedule = validSchedules.FirstOrDefault(ws =>
                 ws.StartTime.Value <= startTime &&
                 ws.EndTime.Value >= endTime);
@@ -109,7 +112,6 @@ namespace BDNAT_Service.Implementation
 
             var userWorkSchedules = await UserWorkScheduleRepo.Instance.GetAllAsync();
 
-            // Get staff with matching work schedule and correct date
             var validUserIds = userWorkSchedules
                 .Where(uws =>
                     uws.WorkScheduleId == matchedWorkSchedule.WorkScheduleId &&
@@ -122,12 +124,17 @@ namespace BDNAT_Service.Implementation
             var allUsers = await UserRepo.Instance.GetAllAsync();
 
             var availableStaff = allUsers
-                .Where(u => validUserIds.Contains(u.UserId) &&
-                            u.Role?.ToLower() == "staff")
+                .Where(u => u.UserId != 0 &&
+                            validUserIds.Contains(u.UserId) &&
+                            (
+                                string.Equals(u.Role, "staff", StringComparison.OrdinalIgnoreCase) ||
+                                string.Equals(u.Role, "manager", StringComparison.OrdinalIgnoreCase)
+                            ))
                 .ToList();
 
             return _mapper.Map<List<UserDTO>>(availableStaff);
         }
+
 
         public async Task<bool> UpdateScheduleStatusAsync(int id, string status)
         {

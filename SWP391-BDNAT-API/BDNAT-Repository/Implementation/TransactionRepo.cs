@@ -29,5 +29,14 @@ namespace BDNAT_Repository.Implementation
         {
             return await _context.Transactions.FirstOrDefaultAsync(t => t.OrderCode == orderCode);
         }
+
+        public async Task<List<Transaction>> GetTransactionByUserIdAsync(int id)
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                return await context.Transactions
+                    .Where(b => b.UserId == id).ToListAsync();
+            }
+        }
     }
 }

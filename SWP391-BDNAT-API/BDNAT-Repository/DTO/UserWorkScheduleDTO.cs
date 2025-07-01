@@ -12,6 +12,8 @@ namespace BDNAT_Repository.DTO
 
         public int? UserId { get; set; }
 
+        public string? Title { get; set; }
+
         public int? WorkScheduleId { get; set; }
 
         public DateTime? Date { get; set; }

@@ -43,8 +43,8 @@ namespace BDNAT_Helper.payOS
                 amount: (int)amount,
                 description: "Thanh toán đơn hàng",
                 items: items,
-                returnUrl: "https://summer2025swp391-se1832-group2-fe.onrender.com/payment-success",
-                cancelUrl: "https://summer2025swp391-se1832-group2-fe.onrender.com/payment-failed"
+                returnUrl: "http://localhost:5173/payment-success",
+                cancelUrl: "http://localhost:5173/payment-failed"
             );
 
             var paymentUrl = await _payOSService.CreatePaymentLink(payOSModel);

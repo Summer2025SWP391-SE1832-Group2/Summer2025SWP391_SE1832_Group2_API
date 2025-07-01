@@ -13,6 +13,7 @@ namespace BDNAT_Service.Interface
     {
         Task<List<TransactionDTO>> GetAllTransactionsAsync();
         Task<TransactionDTO> GetTransactionByIdAsync(int id);
+        Task<List<TransactionDTO>> GetTransactionByUserIdAsync(int Uid);
         Task<bool> CreateTransactionAsync(TransactionDTO transaction);
         Task<bool> UpdateTransactionAsync(TransactionDTO transaction);
         Task<bool> DeleteTransactionAsync(int id);
