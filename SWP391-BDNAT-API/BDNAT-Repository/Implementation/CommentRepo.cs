@@ -35,5 +35,31 @@ namespace BDNAT_Repository.Implementation
 
             return comments;
         }
+
+        public async Task<bool> CreateCommentAsync(Comment comment)
+        {
+            try
+            {
+                if (comment.RootId.HasValue)
+                {
+                    // Kiểm tra xem RootId có tồn tại không
+                    var rootComment = await _context.Comments.FindAsync(comment.RootId.Value);
+                    if (rootComment == null)
+                    {
+                        Console.WriteLine($"Root comment with ID {comment.RootId.Value} does not exist.");
+                        return false;
+                    }
+                }
+
+                await _context.Comments.AddAsync(comment);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating comment: {ex.Message}");
+                return false;
+            }
+        }
+
     }
 }

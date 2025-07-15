@@ -29,6 +29,20 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("getfavorite/{uid}")]
+        public async Task<ActionResult<List<BlogDTO>>> GetAllFavoriteBlogs(int uid)
+        {
+            try
+            {
+                var blogs = await _blogService.GetFavoriteBlogsByUserId(uid);
+                return Ok(blogs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<BlogDTO>> GetBlogById(int id)
         {

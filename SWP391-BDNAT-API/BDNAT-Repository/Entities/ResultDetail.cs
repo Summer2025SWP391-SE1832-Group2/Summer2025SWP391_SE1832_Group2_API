@@ -15,6 +15,8 @@ public partial class ResultDetail
 
     public int SampleId { get; set; }
 
+    public double? Pi { get; set; }
+
     public virtual Booking Booking { get; set; } = null!;
 
     public virtual Sample Sample { get; set; } = null!;

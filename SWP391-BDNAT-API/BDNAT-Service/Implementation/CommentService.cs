@@ -23,7 +23,7 @@ namespace BDNAT_Service.Implementation
         public async Task<bool> CreateCommentAsync(CommentDTO comment)
         {
             var map = _mapper.Map<Comment>(comment);
-            return await CommentRepo.Instance.InsertAsync(map);
+            return await CommentRepo.Instance.CreateCommentAsync(map);
         }
 
         public async Task<bool> DeleteCommentAsync(int id)

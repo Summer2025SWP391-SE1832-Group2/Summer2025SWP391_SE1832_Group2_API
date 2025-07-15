@@ -49,8 +49,8 @@ builder.Services.AddScoped<IPayOSService, PayOSServiceImple>();
 builder.Services.AddScoped<ITeamService, TeamServices>();
 builder.Services.AddScoped<IWorkScheduleService, WorkScheduleService>();
 builder.Services.AddScoped<IUserWorkScheduleService, UserWorkScheduleService>();
-
-
+builder.Services.AddSingleton<AlleleDataService>();
+builder.Services.AddSingleton<PaternityCalculationService>();
 
 builder.Services.AddCors(options =>
 {

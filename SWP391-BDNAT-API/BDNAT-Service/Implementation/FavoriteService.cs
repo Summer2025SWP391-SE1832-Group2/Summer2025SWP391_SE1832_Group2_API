@@ -22,9 +22,18 @@ namespace BDNAT_Service.Implementation
 
         public async Task<bool> CreateFavoriteAsync(FavoriteDTO favorite)
         {
+            var exists = (await FavoriteRepo.Instance.GetAllAsync())
+                .Any(f => f.UserId == favorite.UserId && f.BlogId == favorite.BlogId);
+
+            if (exists)
+            {
+                return false;
+            }
+
             var map = _mapper.Map<Favorite>(favorite);
             return await FavoriteRepo.Instance.InsertAsync(map);
         }
+
 
         public async Task<bool> DeleteFavoriteAsync(int id)
         {

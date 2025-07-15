@@ -9,29 +9,21 @@ namespace BDNAT_Repository.DTO
     public class BookingRequestDTO
     {
         public int BookingId { get; set; }
-
         public int? ServiceId { get; set; }
-
         public int UserId { get; set; }
-
         public DateTime? BookingDate { get; set; }
         public string? Status { get; set; }
         public bool BuyKit { get; set; }
-
         public string Method { get; set; } = null!;
-
         public string? PaymentStatus { get; set; }
-
         public DateTime? PreferredDate { get; set; }
-
         public string? Result { get; set; }
-
         public DateTime CollectionDate { get; set; }
-
         public string? Time { get; set; }
-
         public string Location { get; set; } = null!;
+        public List<SampleDTO>? Samples { get; set; }
     }
+
 
     public class BookingDisplayDTO
     {

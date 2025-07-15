@@ -12,7 +12,7 @@ namespace BDNAT_Repository.DTO
 
         public int? BookingId { get; set; }
 
-        public string? CollectedBy { get; set; }
+        public int? CollectedBy { get; set; }
 
         public DateTime? CollectedDate { get; set; }
 
@@ -23,8 +23,6 @@ namespace BDNAT_Repository.DTO
         public string? Notes { get; set; }
 
         public string? Picture { get; set; }
-
-        public string? Transport { get; set; }
     }
 
     public class SampleWithCollectorDTO
@@ -40,4 +38,11 @@ namespace BDNAT_Repository.DTO
         public string? Picture { get; set; }
         public string? Transport { get; set; }
     }
+
+    public class SamplePictureUpdateDTO
+    {
+        public int SampleId { get; set; }
+        public string Picture { get; set; } = null!;
+    }
+
 }

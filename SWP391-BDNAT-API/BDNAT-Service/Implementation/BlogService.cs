@@ -49,11 +49,18 @@ namespace BDNAT_Service.Implementation
             return BlogList.Select(log => _mapper.Map<BlogDTO>(log)).ToList();
         }
 
+        public async Task<List<BlogDTO>> GetFavoriteBlogsByUserId(int userId)
+        {
+            var BlogList = await BlogRepo.Instance.GetFavoriteBlogsByUserId(userId);
+            return BlogList.Select(log => _mapper.Map<BlogDTO>(log)).ToList();
+        }
 
         public async Task<bool> UpdateBlogAsync(BlogDTO blog)
         {
             var mapBlog = _mapper.Map<Blog>(blog);
             return await BlogRepo.Instance.UpdateAsync(mapBlog);
         }
+
+
     }
 }

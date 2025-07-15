@@ -21,7 +21,10 @@ namespace BDNAT_Repository.DTO
         public string? Value { get; set; }
 
         public int? SampleId { get; set; }
+
         public string? SampleOwnerName { get; set; }
+
+        public double? Pi { get; set; }
     }
 
     public class SaveResultDetailRequest

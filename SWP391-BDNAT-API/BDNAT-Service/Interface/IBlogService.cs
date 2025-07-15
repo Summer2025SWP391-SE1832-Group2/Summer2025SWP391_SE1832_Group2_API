@@ -17,6 +17,7 @@ namespace BDNAT_Service.Interface
         Task<bool> CreateBlogAsync(BlogDTO blog);
         Task<bool> UpdateBlogAsync(BlogDTO blog);
         Task<bool> DeleteBlogAsync(int id);
+        Task<List<BlogDTO>> GetFavoriteBlogsByUserId(int userId);
     }
 
 }

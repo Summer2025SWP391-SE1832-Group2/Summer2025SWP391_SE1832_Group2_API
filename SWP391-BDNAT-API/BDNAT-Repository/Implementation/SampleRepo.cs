@@ -36,6 +36,5 @@ namespace BDNAT_Repository.Implementation
                     .ToListAsync();
             }
         }
-
     }
 }

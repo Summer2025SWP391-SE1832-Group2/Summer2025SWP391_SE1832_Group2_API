@@ -234,7 +234,7 @@ namespace BDNAT_Service.Implementation
             return result;
         }
 
-        public async Task<BookingDisplayDetailDTO?> GetBookingByIdAsync(int id)
+        public async Task<BookingDisplayDetailDTO> GetBookingByIdAsync(int id)
         {
             var data = await BookingRepo.Instance.GetBookingByIdAsync(id);
             if (data == null) return null;

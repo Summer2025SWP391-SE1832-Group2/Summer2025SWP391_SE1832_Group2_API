@@ -17,5 +17,6 @@ namespace BDNAT_Service.Interface
         Task<bool> DeleteTestParameterAsync(int id);
         Task<List<TestParameterResultDTO>> GetResultWithParameterInfoAsync(int ServiceId);
         Task<List<TestParameterFormDTO>> GetTestParameterFormAsync(int bookingId);
+        Task<List<TestParameterFormDTO>> GetTestParameterFormByServiceAsync(int ServiceId);
     }
 }

@@ -95,7 +95,8 @@ namespace BDNAT_Repository.Implementation
                                 Value = r.Value,
                                 ParameterName = r.TestParameter.Parameter.Name,
                                 Description = r.TestParameter.Parameter.Description,
-                                SampleOwnerName = r.Sample.ParticipantName
+                                SampleOwnerName = r.Sample.ParticipantName,
+                                Pi = r.Pi
                             }).ToList()
                     })
                     .FirstOrDefaultAsync();

@@ -18,4 +18,8 @@
     <ProjectReference Include="..\BDNAT-Service\BDNAT-Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
 </Project>

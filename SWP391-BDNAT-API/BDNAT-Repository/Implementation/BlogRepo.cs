@@ -35,5 +35,16 @@ namespace BDNAT_Repository.Implementation
                     .ToListAsync();
             }
         }
+
+        public async Task<List<Blog>> GetFavoriteBlogsByUserId(int userId)
+        {
+            var blogs = await _context.Favorites
+                .Where(f => f.UserId == userId)
+                .Include(f => f.Blog) // nạp Blog liên quan
+                .Select(f => f.Blog!) // bỏ null-safe nếu chắc chắn Blog tồn tại
+                .ToListAsync();
+
+            return blogs;
+        }
     }
 }

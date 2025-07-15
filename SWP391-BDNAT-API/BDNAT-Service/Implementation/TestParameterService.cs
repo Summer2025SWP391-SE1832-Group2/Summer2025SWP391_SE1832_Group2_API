@@ -89,6 +89,23 @@ namespace BDNAT_Service.Implementation
             return result;
         }
 
+        public async Task<List<TestParameterFormDTO>> GetTestParameterFormByServiceAsync(int ServiceId)
+        {
+            int serviceId = ServiceId;
+            //var resultDetails = await ResultDetailRepo.Instance.GetResultDetailsByBookingIdAsync(bookingId);
+            var testParameters = await TestParameterRepo.Instance.GetTestParametersByServiceIdAsync(serviceId);
+
+            var result = testParameters.Select(tp => new TestParameterFormDTO
+            {
+                TestParameterId = tp.TestParameterId,
+                Name = tp.Parameter?.Name,
+                Unit = tp.Parameter?.Unit,
+                Description = tp.Parameter?.Description
+            }).ToList();
+
+            return result;
+        }
+
 
         public async Task<bool> UpdateTestParameterAsync(TestParameterDTO testParameter)
         {

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BDNAT_Service.Implementation
 {
@@ -70,6 +71,51 @@ namespace BDNAT_Service.Implementation
             var map = _mapper.Map<Sample>(sample);
             return await SampleRepo.Instance.UpdateAsync(map);
         }
+
+        public async Task<bool> UpdateSamplePictureAndBookingStatusAsync(SamplePictureUpdateDTO dto)
+        {
+            // 1. Lấy sample theo ID
+            var sample = await SampleRepo.Instance.GetByIdAsync(dto.SampleId);
+            if (sample == null)
+                return false;
+
+            // 2. Cập nhật ảnh
+            sample.Picture = dto.Picture;
+
+            // 3. Cập nhật sample
+            var sampleUpdated = await SampleRepo.Instance.UpdateAsync(sample);
+            if (!sampleUpdated)
+                return false;
+
+            // 4. Kiểm tra số lượng sample đã thu thập cho booking tương ứng
+            if (sample.BookingId.HasValue)
+            {
+                var bookingId = sample.BookingId.Value;
+
+                var allSamples = await SampleRepo.Instance.GetAllAsync();
+                var collectedSamples = allSamples
+                    .Where(s => s.BookingId == bookingId && !string.IsNullOrEmpty(s.Picture))
+                    .ToList();
+
+                var booking = await BookingRepo.Instance.GetByIdAsync(bookingId);
+                if (booking == null)
+                    return false;
+
+                // 5. Cập nhật trạng thái booking theo số lượng mẫu
+                if (collectedSamples.Count >= 2)
+                    booking.Status = "Đã lấy mẫu";
+                else if (collectedSamples.Count == 1)
+                    booking.Status = "Đang lấy mẫu";
+                else
+                    booking.Status = "Chờ lấy mẫu";
+
+                return await BookingRepo.Instance.UpdateAsync(booking);
+            }
+
+            return true; // Sample có thể không liên kết Booking
+        }
+
+
     }
 
 }

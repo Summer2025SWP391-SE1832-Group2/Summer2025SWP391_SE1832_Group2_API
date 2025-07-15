@@ -90,6 +90,21 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpPut("update-picture-and-booking-status")]
+        public async Task<ActionResult<bool>> UpdatePictureAndBookingStatus([FromBody] SamplePictureUpdateDTO dto)
+        {
+            try
+            {
+                var result = await _sampleService.UpdateSamplePictureAndBookingStatusAsync(dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteSample(int id)
         {
