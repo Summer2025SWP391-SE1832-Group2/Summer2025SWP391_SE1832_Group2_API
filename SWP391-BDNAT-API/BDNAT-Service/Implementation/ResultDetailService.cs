@@ -284,7 +284,7 @@ namespace BDNAT_Service.Implementation
             }
 
             // Nếu cfDNA < 4% thì không xác định được
-            if (fetalFraction < 4.0)
+            if (fetalFraction/100 < 4.0)
             {
                 return "Fetal Fraction quá thấp (<4%). Không xác định được nguy cơ cho các trisomy.";
             }
