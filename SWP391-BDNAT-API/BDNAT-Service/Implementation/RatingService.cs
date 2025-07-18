@@ -42,6 +42,12 @@ namespace BDNAT_Service.Implementation
             return _mapper.Map<RatingDTO>(await RatingRepo.Instance.GetByIdAsync(id));
         }
 
+        public async Task<List<RatingDTO>> GetRatingByBookIdAsync(int id)
+        {
+            var list = await RatingRepo.Instance.GetAllAsync();
+            return list.Select(x => _mapper.Map<RatingDTO>(x)).ToList();
+        }
+
         public async Task<bool> UpdateRatingAsync(RatingDTO rating)
         {
             var map = _mapper.Map<Rating>(rating);

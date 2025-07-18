@@ -14,12 +14,14 @@ namespace BDNAT_Repository.DTO
 
         public string? Address { get; set; }
 
-        public string? ShipperName { get; set; }
+        public int? ShipperId { get; set; }
 
         public string? Status { get; set; }
 
         public DateTime? CreateAt { get; set; }
 
         public DateTime? UpdateAt { get; set; }
+
+        public int? BookingId { get; set; }
     }
 }

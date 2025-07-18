@@ -45,6 +45,8 @@ public partial class User
 
     public virtual ICollection<Sample> Samples { get; set; } = new List<Sample>();
 
+    public virtual ICollection<ShippingOrder> ShippingOrders { get; set; } = new List<ShippingOrder>();
+
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
     public virtual ICollection<UserWorkSchedule> UserWorkSchedules { get; set; } = new List<UserWorkSchedule>();

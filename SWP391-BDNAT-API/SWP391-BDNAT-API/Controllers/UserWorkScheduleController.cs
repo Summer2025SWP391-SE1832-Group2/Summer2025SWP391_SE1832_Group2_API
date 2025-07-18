@@ -43,6 +43,23 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("getUser_workScheduleBySlot")]
+        public async Task<ActionResult<List<UserDTO>>> GetUsersByWorkSchedule(int workScheduleId,[FromQuery] DateTime? date)
+        {
+            try
+            {
+                var users = await _userWorkScheduleService.GetUsersByWorkScheduleIdAsync(workScheduleId, date);
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+
         [HttpGet("{id}")]
         public async Task<ActionResult<UserWorkScheduleDTO>> GetById(int id)
         {

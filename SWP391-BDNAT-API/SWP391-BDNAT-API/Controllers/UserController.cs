@@ -31,6 +31,20 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("GetUsersFilteredAsync/{uid}")]
+        public async Task<ActionResult<List<UserDTO>>> GetUsersFilteredAsyncs(int uid)
+        {
+            try
+            {
+                var list = await _userService.GetUsersFilteredAsync(uid);
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserById(int id)
         {
@@ -77,6 +91,21 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpPut("role")]
+        public async Task<ActionResult<bool>> UpdateUserRole([FromQuery] int uid, [FromQuery] string newRole)
+        {
+            try
+            {
+                var result = await _userService.UpdateUserRoleAsync(uid, newRole);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteUser(int id)

@@ -33,5 +33,24 @@ namespace BDNAT_Repository.Implementation
                 .Where(uws => uws.UserId == userId)
                 .ToListAsync();
         }
+
+        public async Task<List<User>> GetUsersAssignedToScheduleAsync(int workScheduleId, DateTime? date)
+        {
+            var query = _context.UserWorkSchedules
+                .AsNoTracking()
+                .Include(uws => uws.User)
+                .Where(uws => uws.WorkScheduleId == workScheduleId);
+
+            if (date.HasValue)
+            {
+                query = query.Where(uws => uws.Date != null && uws.Date.Value.Date == date.Value.Date);
+            }
+
+            return await query
+                .Select(uws => uws.User!)
+                .ToListAsync();
+        }
+
+
     }
 }

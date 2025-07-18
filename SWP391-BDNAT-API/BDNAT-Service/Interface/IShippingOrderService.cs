@@ -14,5 +14,7 @@ namespace BDNAT_Service.Interface
         Task<bool> CreateShippingOrderAsync(ShippingOrderDTO shippingOrder);
         Task<bool> UpdateShippingOrderAsync(ShippingOrderDTO shippingOrder);
         Task<bool> DeleteShippingOrderAsync(int id);
+        Task<List<ShippingOrderDTO>> GetShippingOrderByBookingIdAsync(int bookingId);
+
     }
 }

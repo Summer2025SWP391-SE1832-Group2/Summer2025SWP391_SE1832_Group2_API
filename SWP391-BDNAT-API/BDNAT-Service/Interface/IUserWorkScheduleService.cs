@@ -18,5 +18,6 @@ namespace BDNAT_Service.Interface
         Task<bool> UpdateUserWorkScheduleAsync(UserWorkScheduleDTO UserWorkSchedule);
         Task<bool> DeleteUserWorkScheduleAsync(int id);
         Task<List<UserWorkScheduleDTO>> GetUserWorkSchedulesByUserIDAsync(int userId);
+        Task<List<UserDTO>> GetUsersByWorkScheduleIdAsync(int workScheduleId, DateTime? date);
     }
 }

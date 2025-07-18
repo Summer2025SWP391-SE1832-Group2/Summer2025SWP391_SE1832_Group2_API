@@ -55,7 +55,6 @@ namespace BDNAT_Service.Implementation
                 ParticipantName = s.ParticipantName,
                 Notes = s.Notes,
                 Picture = s.Picture,
-                Transport = s.Transport
             }).ToList();
 
             return result;

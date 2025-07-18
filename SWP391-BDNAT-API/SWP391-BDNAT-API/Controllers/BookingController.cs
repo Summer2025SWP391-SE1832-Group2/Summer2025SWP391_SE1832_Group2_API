@@ -152,7 +152,7 @@ namespace SWP391_BDNAT_API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<bool>> UpdateBooking([FromBody] BookingRequestDTO dto)
+        public async Task<ActionResult<bool>> UpdateBooking([FromBody] BookingDisplayDTO dto)
         {
             try
             {

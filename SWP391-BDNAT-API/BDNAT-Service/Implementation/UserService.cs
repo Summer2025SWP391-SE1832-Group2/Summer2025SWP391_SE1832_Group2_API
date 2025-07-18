@@ -14,7 +14,6 @@ namespace BDNAT_Service.Implementation
     public class UserService : IUserService
     {
         private readonly IMapper _mapper;
-
         public UserService(IMapper mapper)
         {
             _mapper = mapper;
@@ -31,6 +30,12 @@ namespace BDNAT_Service.Implementation
             return await UserRepo.Instance.DeleteAsync(id);
         }
 
+        public async Task<List<UserDTO>> GetUsersFilteredAsync(int currentUserId)
+        {
+            var list = await UserRepo.Instance.GetUsersFilteredAsync(currentUserId);
+            return list.Select(x => _mapper.Map<UserDTO>(x)).ToList();
+        }
+
         public async Task<List<UserDTO>> GetAllUsersAsync()
         {
             var list = await UserRepo.Instance.GetAllAsync();
@@ -45,8 +50,21 @@ namespace BDNAT_Service.Implementation
         public async Task<bool> UpdateUserAsync(UserDTO user)
         {
             var map = _mapper.Map<User>(user);
+
             return await UserRepo.Instance.UpdateAsync(map);
         }
+
+        public async Task<bool> UpdateUserRoleAsync(int userId, string newRole)
+        {
+            var user = await UserRepo.Instance.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            user.Role = newRole;
+            await UserRepo.Instance.UpdateAsync(user);
+
+            return true;
+        }
+
     }
 
 }

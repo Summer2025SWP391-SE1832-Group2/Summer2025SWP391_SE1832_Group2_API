@@ -43,6 +43,8 @@ public partial class Booking
 
     public virtual Service Service { get; set; } = null!;
 
+    public virtual ICollection<ShippingOrder> ShippingOrders { get; set; } = new List<ShippingOrder>();
+
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
     public virtual User User { get; set; } = null!;

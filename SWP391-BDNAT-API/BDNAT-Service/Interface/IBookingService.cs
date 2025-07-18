@@ -16,7 +16,7 @@ namespace BDNAT_Service.Interface
         Task<BookingDisplayDetailDTO> GetBookingByIdAsync(int id);
         Task<List<BookingDisplayDTO>> GetBookingByUserIdAsync(int id);
         Task<string?> CreateBookingAsync(BookingRequestDTO booking);
-        Task<bool> UpdateBookingAsync(BookingRequestDTO booking);
+        Task<bool> UpdateBookingAsync(BookingDisplayDTO booking);
         Task<bool> DeleteBookingAsync(int id);
         Task<string?> RegeneratePaymentQrAsync(int bookingId);
         Task<List<BookingScheduleDTO>> GetBookingsByCollectorAsync(int collectorId);

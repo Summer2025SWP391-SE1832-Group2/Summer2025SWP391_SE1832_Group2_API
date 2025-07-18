@@ -11,6 +11,7 @@ namespace BDNAT_Service.Interface
     {
         Task<List<RatingDTO>> GetAllRatingsAsync();
         Task<RatingDTO> GetRatingByIdAsync(int id);
+        Task<List<RatingDTO>> GetRatingByBookIdAsync(int id);
         Task<bool> CreateRatingAsync(RatingDTO rating);
         Task<bool> UpdateRatingAsync(RatingDTO rating);
         Task<bool> DeleteRatingAsync(int id);

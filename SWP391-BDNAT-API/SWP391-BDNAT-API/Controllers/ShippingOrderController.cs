@@ -45,6 +45,24 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("by-booking/{bookingId}")]
+        public async Task<ActionResult<List<ShippingOrderDTO>>> GetShippingOrderByBookingId(int bookingId)
+        {
+            try
+            {
+                var item = await _shippingOrderService.GetShippingOrderByBookingIdAsync(bookingId);
+                if (item == null)
+                    return NotFound($"ShippingOrder with BookingId {bookingId} not found");
+
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
         [HttpPost]
         public async Task<ActionResult<bool>> CreateShippingOrder([FromBody] ShippingOrderDTO dto)
         {

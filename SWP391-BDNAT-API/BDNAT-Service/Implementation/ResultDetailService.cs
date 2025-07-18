@@ -53,41 +53,6 @@ namespace BDNAT_Service.Implementation
             return false;
         }*/
 
-        public async Task<bool> UpdateMultipleResultsAsync(SaveResultDetailRequest dto)
-        {
-            if (dto == null || dto.BookingId == 0 || dto.Results == null || !dto.Results.Any())
-                return false;
-
-            // Lấy danh sách result hiện tại trong DB
-            var existingResults = await ResultDetailRepo.Instance.GetResultDetailsByBookingIdAsync(dto.BookingId);
-
-            foreach (var updateItem in dto.Results)
-            {
-                var result = existingResults.FirstOrDefault(r => r.ResultDetailId == updateItem.ResultDetailId);
-                if (result != null)
-                {
-                    result.Value = updateItem.Value;
-                    result.TestParameterId = updateItem.TestParameterId ?? result.TestParameterId;
-                    result.SampleId = updateItem.SampleId ?? result.SampleId;
-                }
-            }
-
-            // Cập nhật batch
-            var updated = await ResultDetailRepo.Instance.UpdateRangeAsync(existingResults);
-            if (!updated)
-                return false;
-
-            // Cập nhật Booking
-            var booking = await BookingRepo.Instance.GetById(dto.BookingId);
-            if (booking == null) return false;
-
-            booking.FinalResult = dto.FinalResult;
-            booking.Status = "Hoàn thành";
-
-            return await BookingRepo.Instance.UpdateAsync(booking);
-        }
-
-
         public async Task<bool> DeleteResultAsync(int id)
         {
             return await ResultDetailRepo.Instance.DeleteAsync(id);
@@ -126,89 +91,179 @@ namespace BDNAT_Service.Implementation
             return await ResultDetailRepo.Instance.UpdateAsync(map);
         }
 
+        public async Task<bool> UpdateMultipleResultsAsync(SaveResultDetailRequest dto)
+        {
+            if (dto == null || dto.BookingId == 0 || dto.Results == null || !dto.Results.Any())
+                return false;
+
+            try
+            {
+                // Lấy danh sách result hiện tại trong DB
+                var existingResults = await ResultDetailRepo.Instance.GetResultDetailsByBookingIdAsync(dto.BookingId);
+
+                foreach (var updateItem in dto.Results)
+                {
+                    var result = existingResults.FirstOrDefault(r => r.ResultDetailId == updateItem.ResultDetailId);
+                    if (result != null)
+                    {
+                        result.Value = updateItem.Value;
+                        result.TestParameterId = updateItem.TestParameterId ?? result.TestParameterId;
+                        result.SampleId = updateItem.SampleId ?? result.SampleId;
+                    }
+                }
+
+                // Cập nhật batch
+                var updated = await ResultDetailRepo.Instance.UpdateRangeAsync(existingResults);
+                if (!updated)
+                    return false;
+
+                // Lấy lại thông tin booking
+                var booking = await BookingRepo.Instance.GetById(dto.BookingId);
+                if (booking == null) return false;
+
+                // Kiểm tra có phải NIPT không
+                bool isNipt = booking.Service?.Name != null &&
+                              booking.Service.Name.Contains("NIPT", StringComparison.OrdinalIgnoreCase);
+
+                string calculatedResult = dto.FinalResult;
+
+                // Nếu không phải NIPT, tính toán lại kết quả cha-con
+                if (isNipt)
+                {
+                    calculatedResult = GenerateNiptConclusion(dto);
+                }
+                else
+                {
+                    // Tính toán xác suất quan hệ cha con nếu không phải NIPT
+                    if (dto.Results != null && dto.Results.Any())
+                    {
+                        var isDnaPaternityTest = CheckIfDnaPaternityTest(dto.Results);
+
+                        if (isDnaPaternityTest)
+                        {
+                            try
+                            {
+                                var paternityResult = _paternityCalculationService.CalculateFromResultDetails(dto.Results);
+                                var detailedReport = _paternityCalculationService.GeneratePaternityReport(paternityResult, dto.Results);
+
+                                calculatedResult = paternityResult.W * 100 + "% " + paternityResult.Conclusion;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Lỗi khi tính toán xác suất cha con: {ex.Message}");
+                                calculatedResult = dto.FinalResult ?? "Không thể tính toán được kết quả";
+                            }
+                        }
+                    }
+                }
+
+                // Cập nhật Booking
+                booking.FinalResult = calculatedResult;
+                booking.Status = "Hoàn thành";
+
+                return await BookingRepo.Instance.UpdateAsync(booking);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi trong UpdateMultipleResultsAsync: {ex.Message}");
+                return false;
+            }
+        }
+
         public async Task<bool> CreateMultipleResultsAsync(SaveResultDetailRequest dto)
         {
             var updateBooking = await BookingRepo.Instance.GetById(dto.BookingId);
 
             try
             {
-                // Tính toán xác suất quan hệ cha con nếu có đủ dữ liệu
+                bool isNipt = updateBooking.Service?.Name != null &&
+                              updateBooking.Service.Name.Contains("NIPT", StringComparison.OrdinalIgnoreCase);
+
                 string calculatedResult = dto.FinalResult;
 
-                if (dto.Results != null && dto.Results.Any())
+                if (isNipt)
                 {
-                    // Kiểm tra xem có phải test xác định quan hệ cha con không
-                    var isDnaPaternityTest = CheckIfDnaPaternityTest(dto.Results);
-
-                    if (isDnaPaternityTest)
+                    calculatedResult = GenerateNiptConclusion(dto);
+                }
+                else
+                {
+                    // Tính toán xác suất quan hệ cha con nếu không phải NIPT
+                    if (dto.Results != null && dto.Results.Any())
                     {
-                        try
-                        {
-                            var paternityResult = _paternityCalculationService.CalculateFromResultDetails(dto.Results);
-                            var detailedReport = _paternityCalculationService.GeneratePaternityReport(paternityResult, dto.Results);
+                        var isDnaPaternityTest = CheckIfDnaPaternityTest(dto.Results);
 
-                            // Cập nhật kết quả cuối cùng với báo cáo chi tiết
-                            calculatedResult = paternityResult.W *100 + "% " + paternityResult.Conclusion;
-
-                            // Hoặc nếu chỉ muốn kết luận ngắn gọn:
-                            // calculatedResult = $"CPI: {paternityResult.CPI:F4}, W: {paternityResult.W:P2}, Kết luận: {paternityResult.Conclusion}";
-                        }
-                        catch (Exception ex)
+                        if (isDnaPaternityTest)
                         {
-                            // Log lỗi nhưng vẫn tiếp tục với kết quả gốc
-                            Console.WriteLine($"Lỗi khi tính toán xác suất cha con: {ex.Message}");
-                            calculatedResult = dto.FinalResult ?? "Không thể tính toán được kết quả";
+                            try
+                            {
+                                var paternityResult = _paternityCalculationService.CalculateFromResultDetails(dto.Results);
+                                var detailedReport = _paternityCalculationService.GeneratePaternityReport(paternityResult, dto.Results);
+
+                                calculatedResult = paternityResult.W * 100 + "% " + paternityResult.Conclusion;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Lỗi khi tính toán xác suất cha con: {ex.Message}");
+                                calculatedResult = dto.FinalResult ?? "Không thể tính toán được kết quả";
+                            }
                         }
                     }
                 }
 
-                // Cập nhật booking
+                // Cập nhật trạng thái và kết quả cuối
                 updateBooking.FinalResult = calculatedResult;
                 updateBooking.Status = "Hoàn thành";
+
                 var check = await BookingRepo.Instance.UpdateAsync(updateBooking);
 
-                if (check)
+                if (!check || dto.Results == null || !dto.Results.Any())
+                    return false;
+
+                var resultEntities = new List<ResultDetail>();
+
+                Dictionary<string, double>? piLookup = null;
+
+                // Nếu không phải NIPT, thì tính PI để lưu vào ResultDetail
+                if (!isNipt)
                 {
-                    if (dto.Results == null || !dto.Results.Any())
-                        return false;
-
-                    var resultEntities = new List<ResultDetail>();
-                        // Tính toán PI cho từng locus và lưu vào ResultDetail
-                        var paternityResult = _paternityCalculationService.CalculateFromResultDetails(dto.Results);
-                        var piLookup = paternityResult.Comparisons.ToDictionary(c => c.Locus, c => c.PI);
-
-                        foreach (var r in dto.Results)
-                        {
-                            var entity = new ResultDetail
-                            {
-                                BookingId = dto.BookingId,
-                                TestParameterId = r.TestParameterId ?? 0,
-                                Value = r.Value,
-                                SampleId = r.SampleId ?? 0
-                            };
-
-                            // Lưu PI vào sample có ID nhỏ hơn trong cặp so sánh
-                            if (!string.IsNullOrEmpty(r.ParameterName) && piLookup.ContainsKey(r.ParameterName))
-                            {
-                                var sampleIds = dto.Results.Where(x => x.ParameterName == r.ParameterName)
-                                                          .Select(x => x.SampleId ?? 0)
-                                                          .Distinct()
-                                                          .OrderBy(x => x)
-                                                          .ToList();
-
-                                // Chỉ lưu PI vào sample có ID nhỏ nhất
-                                if (sampleIds.Count >= 2 && r.SampleId == sampleIds[0])
-                                {
-                                    entity.Pi = piLookup[r.ParameterName];
-                                }
-                            }
-                            resultEntities.Add(entity);
-                        }
-
-                    await ResultDetailRepo.Instance.AddRangeAsync(resultEntities);
-                    return true;
+                    var paternityResult = _paternityCalculationService.CalculateFromResultDetails(dto.Results);
+                    piLookup = paternityResult.Comparisons.ToDictionary(c => c.Locus, c => c.PI);
                 }
-                return false;
+
+                foreach (var r in dto.Results)
+                {
+                    var entity = new ResultDetail
+                    {
+                        BookingId = dto.BookingId,
+                        TestParameterId = r.TestParameterId ?? 0,
+                        Value = r.Value,
+                        SampleId = r.SampleId ?? 0
+                    };
+
+                    // Chỉ lưu PI nếu không phải NIPT và dữ liệu phù hợp
+                    if (!isNipt &&
+                        !string.IsNullOrEmpty(r.ParameterName) &&
+                        piLookup != null &&
+                        piLookup.ContainsKey(r.ParameterName))
+                    {
+                        var sampleIds = dto.Results
+                                           .Where(x => x.ParameterName == r.ParameterName)
+                                           .Select(x => x.SampleId ?? 0)
+                                           .Distinct()
+                                           .OrderBy(x => x)
+                                           .ToList();
+
+                        if (sampleIds.Count >= 2 && r.SampleId == sampleIds[0])
+                        {
+                            entity.Pi = piLookup[r.ParameterName];
+                        }
+                    }
+
+                    resultEntities.Add(entity);
+                }
+
+                await ResultDetailRepo.Instance.AddRangeAsync(resultEntities);
+                return true;
             }
             catch (Exception ex)
             {
@@ -216,6 +271,54 @@ namespace BDNAT_Service.Implementation
                 return false;
             }
         }
+
+        public string GenerateNiptConclusion(SaveResultDetailRequest dto)
+        {
+            string cfDnaConclusionNote = string.Empty;
+            string result = string.Empty;
+
+            // Parse cfDNA value
+            if (!double.TryParse(dto.cfDNA, out var fetalFraction))
+            {
+                return "Không thể xác định được cfDNA hợp lệ.";
+            }
+
+            // Nếu cfDNA < 4% thì không xác định được
+            if (fetalFraction < 4.0)
+            {
+                return "Fetal Fraction quá thấp (<4%). Không xác định được nguy cơ cho các trisomy.";
+            }
+
+            // Dictionary lưu kết luận cho từng loại trisomy
+            var conclusions = new Dictionary<string, string>();
+
+            foreach (var trisomy in new[] { "21", "18", "13" })
+            {
+                var paramName = $"Z-score (Trisomy {trisomy})";
+                var resultParam = dto.Results.FirstOrDefault(r => r.ParameterName == paramName);
+
+                if (resultParam != null && double.TryParse(resultParam.Value, out var zScore))
+                {
+                    if (zScore > 2.5)
+                        conclusions[trisomy] = "Nguy cơ cao";
+                    else
+                        conclusions[trisomy] = "Nguy cơ thấp";
+                }
+                else
+                {
+                    conclusions[trisomy] = "Không có dữ liệu";
+                }
+            }
+
+            // Format kết luận
+            result = $"Kết quả NIPT:\n" +
+                     $"- Trisomy 21: {conclusions["21"]}\n" +
+                     $"- Trisomy 18: {conclusions["18"]}\n" +
+                     $"- Trisomy 13: {conclusions["13"]}";
+
+            return result;
+        }
+
 
         private bool CheckIfDnaPaternityTest(List<ResultDetailDTO> results)
         {

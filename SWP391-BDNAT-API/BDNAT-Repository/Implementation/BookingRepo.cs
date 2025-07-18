@@ -32,8 +32,9 @@ namespace BDNAT_Repository.Implementation
             {
                 return await context.Bookings
                     .Include(b => b.User) // User đặt lịch
+                    .Include(r => r.Ratings)
                     .Include(b => b.SampleCollectionSchedules)
-                        .ThenInclude(s => s.Collector) // Nhân viên thu mẫu
+                        .ThenInclude(s => s.Collector)// Nhân viên thu mẫu
                     .ToListAsync();
             }
         }
@@ -58,6 +59,7 @@ namespace BDNAT_Repository.Implementation
                     {
                         BookingId = b.BookingId,
                         UserId = b.UserId,
+                        ServiceId = b.ServiceId,
                         BookingDate = b.BookingDate,
                         Status = b.Status,
                         PaymentStatus = b.PaymentStatus,
@@ -84,6 +86,8 @@ namespace BDNAT_Repository.Implementation
                             .ThenByDescending(s => s.Time)
                             .Select(s => s.Location)
                             .FirstOrDefault() ?? string.Empty,
+
+                        hasSubmittedRating = b.Ratings.Any(),
 
                         ResultDetails = b.ResultDetails
                             .Select(r => new ResultDetailDTO

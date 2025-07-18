@@ -21,7 +21,9 @@ public partial class Sample
 
     public string? Picture { get; set; }
 
-    public string? Transport { get; set; }
+    public int? GestationalAge { get; set; }
+
+    public int? FetalCount { get; set; }
 
     public virtual Booking? Booking { get; set; }
 

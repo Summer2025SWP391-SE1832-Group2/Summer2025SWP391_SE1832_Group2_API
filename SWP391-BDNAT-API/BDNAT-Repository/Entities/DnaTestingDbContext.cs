@@ -47,6 +47,8 @@ public partial class DnaTestingDbContext : DbContext
 
     public virtual DbSet<ServiceType> ServiceTypes { get; set; }
 
+    public virtual DbSet<ShippingOrder> ShippingOrders { get; set; }
+
     public virtual DbSet<Team> Teams { get; set; }
 
     public virtual DbSet<TeamService> TeamServices { get; set; }
@@ -273,6 +275,7 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.ResultDetailId).HasColumnName("ResultDetailID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.Note).HasMaxLength(100);
             entity.Property(e => e.Pi).HasColumnName("PI");
             entity.Property(e => e.SampleId).HasColumnName("SampleID");
             entity.Property(e => e.TestParameterId).HasColumnName("TestParameterID");
@@ -305,7 +308,6 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.CollectedDate).HasColumnType("date");
             entity.Property(e => e.ParticipantName).HasMaxLength(100);
             entity.Property(e => e.SampleType).HasMaxLength(100);
-            entity.Property(e => e.Transport).HasMaxLength(100);
 
             entity.HasOne(d => d.Booking).WithMany(p => p.Samples)
                 .HasForeignKey(d => d.BookingId)
@@ -388,6 +390,29 @@ public partial class DnaTestingDbContext : DbContext
 
             entity.Property(e => e.ServiceTypeId).HasColumnName("ServiceTypeID");
             entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<ShippingOrder>(entity =>
+        {
+            entity.HasKey(e => e.ShippingId).HasName("PK__Shipping__5FACD58019C188F4");
+
+            entity.ToTable("ShippingOrder");
+
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.CreateAt).HasColumnType("datetime");
+            entity.Property(e => e.Receiver).HasMaxLength(255);
+            entity.Property(e => e.ShipperId).HasColumnName("ShipperID");
+            entity.Property(e => e.Status).HasMaxLength(100);
+            entity.Property(e => e.UpdateAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Booking).WithMany(p => p.ShippingOrders)
+                .HasForeignKey(d => d.BookingId)
+                .HasConstraintName("FK_ShippingOrder_Booking");
+
+            entity.HasOne(d => d.Shipper).WithMany(p => p.ShippingOrders)
+                .HasForeignKey(d => d.ShipperId)
+                .HasConstraintName("FK_ShippingOrder_Users");
         });
 
         modelBuilder.Entity<Team>(entity =>

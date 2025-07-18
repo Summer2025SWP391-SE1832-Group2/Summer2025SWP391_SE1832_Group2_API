@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BDNAT_Repository.Interface;
 
 namespace BDNAT_Service.Implementation
 {
@@ -47,6 +48,15 @@ namespace BDNAT_Service.Implementation
             var map = _mapper.Map<ShippingOrder>(shippingOrder);
             return await ShippingOrderRepo.Instance.UpdateAsync(map);
         }
+
+        public async Task<List<ShippingOrderDTO>> GetShippingOrderByBookingIdAsync(int bookingId)
+        {
+            var list = await ShippingOrderRepo.Instance.GetByBookingIdAsync(bookingId);
+            if (list == null) return null;
+
+            return list.Select(x => _mapper.Map<ShippingOrderDTO>(x)).ToList();
+        }
+
     }
 
 }

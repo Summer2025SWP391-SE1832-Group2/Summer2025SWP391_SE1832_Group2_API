@@ -47,6 +47,8 @@ namespace BDNAT_Repository.DTO
         public string? Time { get; set; }
 
         public string Location { get; set; } = null!;
+
+        public bool hasSubmittedRating { get; set; }
     }
 
     public class BookingDisplayDetailDTO
@@ -54,7 +56,7 @@ namespace BDNAT_Repository.DTO
         public int BookingId { get; set; }
 
         public int? UserId { get; set; }
-
+        public int? ServiceId { get; set; }
         public string? FullName { get; set; }
 
         public DateTime? BookingDate { get; set; }
@@ -74,6 +76,8 @@ namespace BDNAT_Repository.DTO
         public string? Time { get; set; }
 
         public string Location { get; set; } = null!;
+
+        public bool hasSubmittedRating { get; set; }
 
         public List<ResultDetailDTO>? ResultDetails { get; set; }
     }

@@ -11,7 +11,7 @@ public partial class ShippingOrder
 
     public string? Address { get; set; }
 
-    public string? ShipperName { get; set; }
+    public int? ShipperId { get; set; }
 
     public string? Status { get; set; }
 
@@ -19,5 +19,9 @@ public partial class ShippingOrder
 
     public DateTime? UpdateAt { get; set; }
 
-    public virtual ICollection<KitOrder> KitOrders { get; set; } = new List<KitOrder>();
+    public int? BookingId { get; set; }
+
+    public virtual Booking? Booking { get; set; }
+
+    public virtual User? Shipper { get; set; }
 }

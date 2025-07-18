@@ -14,5 +14,7 @@ namespace BDNAT_Service.Interface
         Task<bool> CreateUserAsync(UserDTO User);
         Task<bool> UpdateUserAsync(UserDTO User);
         Task<bool> DeleteUserAsync(int id);
+        Task<List<UserDTO>> GetUsersFilteredAsync(int id);
+        Task<bool> UpdateUserRoleAsync(int userId, string newRole);
     }
 }

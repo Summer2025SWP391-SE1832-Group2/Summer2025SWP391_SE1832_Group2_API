@@ -127,7 +127,7 @@ namespace BDNAT_Service.Implementation
                 .Where(u => u.UserId != 0 &&
                             validUserIds.Contains(u.UserId) &&
                             (
-                                string.Equals(u.Role, "staff", StringComparison.OrdinalIgnoreCase) ||
+                                u.Role != null && u.Role.Contains("Staff", StringComparison.OrdinalIgnoreCase) ||
                                 string.Equals(u.Role, "manager", StringComparison.OrdinalIgnoreCase)
                             ))
                 .ToList();

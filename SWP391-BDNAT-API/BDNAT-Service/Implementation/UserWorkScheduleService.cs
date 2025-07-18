@@ -79,5 +79,13 @@ namespace BDNAT_Service.Implementation
             return result;
         }
 
+        public async Task<List<UserDTO>> GetUsersByWorkScheduleIdAsync(int workScheduleId, DateTime? date)
+        {
+            var users = await UserWorkScheduleRepo.Instance.GetUsersAssignedToScheduleAsync(workScheduleId, date);
+
+            return users.Select(u => _mapper.Map<UserDTO>(u)).ToList();
+        }
+
+
     }
 }

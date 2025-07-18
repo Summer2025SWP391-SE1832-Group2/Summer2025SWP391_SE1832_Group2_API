@@ -74,6 +74,25 @@ namespace BDNAT_Service.Implementation
             var scheduleCreated = await SampleCollectionScheduleRepo.Instance.InsertAsync(schedule);
             if (!scheduleCreated) return null;
 
+            // Nếu là phương thức tự thu mẫu => tạo thêm ShippingOrder
+            if (bookingDto.Method == "TU_THU_MAU")
+            {
+                var user = await UserRepo.Instance.GetById(bookingDto.UserId);
+                var shippingOrder = new ShippingOrder
+                {
+                    BookingId = booking.BookingId,
+                    Receiver = user.FullName, // Hoặc lấy tên thực từ UserRepo nếu muốn
+                    Address = bookingDto.Location,
+                    ShipperId = null, // Gán sau nếu có phân công
+                    Status = "Chờ giao hàng",
+                    CreateAt = DateTime.Now.AddDays(1),
+                    UpdateAt = null
+                };
+
+                var shippingCreated = await ShippingOrderRepo.Instance.InsertAsync(shippingOrder);
+                if (!shippingCreated) return null;
+            }
+
             // 6. Tính tiền
             decimal amount;
             if (bookingDto.Method == "Delivery")
@@ -184,6 +203,7 @@ namespace BDNAT_Service.Implementation
                 {
                     BookingId = x.BookingId,
                     UserId = x.UserId,
+                    ServiceId = x.ServiceId,
                     BookingDate = x.BookingDate,
                     Status = x.Status,
                     PaymentStatus = x.PaymentStatus,
@@ -191,7 +211,8 @@ namespace BDNAT_Service.Implementation
                     Method = x.Method,
                     CollectionDate = schedule?.CollectionDate,
                     Time = schedule?.Time,
-                    Location = schedule?.Location ?? ""
+                    Location = schedule?.Location ?? "",
+                    hasSubmittedRating = x.Ratings.Any(),
                 };
             }).ToList();
 
@@ -269,7 +290,7 @@ namespace BDNAT_Service.Implementation
             return result;
         }
 
-        public async Task<bool> UpdateBookingAsync(BookingRequestDTO booking)
+        public async Task<bool> UpdateBookingAsync(BookingDisplayDTO booking)
         {
             var map = _mapper.Map<Booking>(booking);
             return await BookingRepo.Instance.UpdateAsync(map);

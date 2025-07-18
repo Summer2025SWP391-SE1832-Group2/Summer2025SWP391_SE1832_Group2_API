@@ -45,6 +45,22 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("getbyBook/{bookId}")]
+        public async Task<ActionResult<RatingDTO>> GetRatingByBookingId(int bookId)
+        {
+            try
+            {
+                var item = await _ratingService.GetRatingByBookIdAsync(bookId);
+                if (item == null)
+                    return NotFound($"Rating with ID {bookId} not found");
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<bool>> CreateRating([FromBody] RatingDTO dto)
         {
