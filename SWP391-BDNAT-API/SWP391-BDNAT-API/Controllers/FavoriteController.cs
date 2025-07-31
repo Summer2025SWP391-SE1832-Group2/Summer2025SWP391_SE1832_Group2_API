@@ -1,4 +1,5 @@
 ﻿using BDNAT_Repository.DTO;
+using BDNAT_Repository.Entities;
 using BDNAT_Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,13 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpGet("blog/{blogId}")]
+        public async Task<IActionResult> GetFavoritesByBlog(int blogId)
+        {
+            var result = await _favoriteService.GetFavoritesByBlogAsync(blogId);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<FavoriteDTO>> GetFavoriteById(int id)
         {
@@ -45,15 +53,12 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult<bool>> CreateFavorite([FromBody] FavoriteDTO dto)
+        [HttpPost("toggle")]
+        public async Task<ActionResult<bool>> ToggleFavorite([FromBody] FavoriteDTO dto)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var result = await _favoriteService.CreateFavoriteAsync(dto);
+                var result = await _favoriteService.CreateOrToggleFavoriteAsync(dto);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -61,6 +66,7 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
 
         [HttpPut]
         public async Task<ActionResult<bool>> UpdateFavorite([FromBody] FavoriteDTO dto)

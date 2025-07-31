@@ -3,6 +3,8 @@ using BDNAT_Repository;
 using BDNAT_Repository.Entities;
 using BDNAT_Service.Implementation;
 using BDNAT_Service.Interface;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -24,6 +26,7 @@ builder.Services.AddSingleton(x =>
         builder.Configuration["payOS:checksumKey"]
     )
 );
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IBlogsTypeService, BlogsTypeService>();
@@ -49,8 +52,10 @@ builder.Services.AddScoped<IPayOSService, PayOSServiceImple>();
 builder.Services.AddScoped<ITeamService, TeamServices>();
 builder.Services.AddScoped<IWorkScheduleService, WorkScheduleService>();
 builder.Services.AddScoped<IUserWorkScheduleService, UserWorkScheduleService>();
+builder.Services.AddScoped<IFirebaseNotificationService, FirebaseNotificationService>();
 builder.Services.AddSingleton<AlleleDataService>();
 builder.Services.AddSingleton<PaternityCalculationService>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -107,7 +112,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+var path = @"C:\Users\ToanVu\Desktop\SUM25\DNA.Testing.API\SWP391-BDNAT-API\SWP391-BDNAT-API\SWP391-BDNAT-API\swp391-dna-testing-system-firebase-adminsdk-fbsvc-71317f55e1.json";
+var credential = GoogleCredential.FromFile(path);
 
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = credential
+});
 
 var app = builder.Build();
 

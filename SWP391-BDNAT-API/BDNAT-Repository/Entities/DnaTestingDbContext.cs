@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace BDNAT_Repository.Entities;
 
@@ -31,6 +30,8 @@ public partial class DnaTestingDbContext : DbContext
     public virtual DbSet<Feedback> Feedbacks { get; set; }
 
     public virtual DbSet<KitOrder> KitOrders { get; set; }
+
+    public virtual DbSet<Notification> Notifications { get; set; }
 
     public virtual DbSet<Parameter> Parameters { get; set; }
 
@@ -66,23 +67,15 @@ public partial class DnaTestingDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserNotificationToken> UserNotificationTokens { get; set; }
+
     public virtual DbSet<UserWorkSchedule> UserWorkSchedules { get; set; }
 
     public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer(getConnectionString());
-        }
-    }
-    public string getConnectionString()
-    {
-        var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
-        var configuration = builder.Build();
-        return configuration.GetConnectionString("DB");
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=(local);Database= DNA_Testing_db;Uid=sa;Pwd=admin12345;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -247,6 +240,22 @@ public partial class DnaTestingDbContext : DbContext
                 .HasForeignKey(d => d.TestKitId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__KitOrder__TestKi__693CA210");
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Notifica__3214EC07B591299C");
+
+            entity.Property(e => e.IsRead).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ReceivedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Title).HasMaxLength(255);
+
+            entity.HasOne(d => d.User).WithMany(p => p.Notifications)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Notifications_Users");
         });
 
         modelBuilder.Entity<Parameter>(entity =>
@@ -565,6 +574,24 @@ public partial class DnaTestingDbContext : DbContext
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
             entity.Property(e => e.Phone).HasMaxLength(20);
             entity.Property(e => e.Role).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<UserNotificationToken>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__UserNoti__3214EC07A53BFECC");
+
+            entity.ToTable("UserNotificationToken");
+
+            entity.Property(e => e.IsRevoked).HasDefaultValueSql("((0))");
+            entity.Property(e => e.LastUpdated)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Token).HasMaxLength(512);
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserNotificationTokens)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserNotificationToken_Users");
         });
 
         modelBuilder.Entity<UserWorkSchedule>(entity =>

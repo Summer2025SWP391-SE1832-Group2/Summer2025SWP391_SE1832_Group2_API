@@ -28,4 +28,12 @@ namespace BDNAT_Repository.DTO
 
         public string? Address { get; set; }
     }
+
+    public class DashboardInfoDto
+    {
+        public int TotalBookings { get; set; }
+        public int TotalBookingsToday { get; set; }
+        public int TotalUsers { get; set; }
+        public int TotalBookingsCompleted { get; set; }
+    }
 }

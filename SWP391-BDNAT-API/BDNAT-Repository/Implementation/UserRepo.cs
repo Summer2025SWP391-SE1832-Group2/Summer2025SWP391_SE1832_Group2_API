@@ -1,4 +1,5 @@
-﻿using BDNAT_Repository.Entities;
+﻿using BDNAT_Repository.DTO;
+using BDNAT_Repository.Entities;
 using BDNAT_Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -57,5 +58,24 @@ namespace BDNAT_Repository.Implementation
             }
         }
 
-    }
-}
+        public async Task<DashboardInfoDto> GetDashboardInfoAsync()
+        {
+            using (var context = new DnaTestingDbContext())
+            {
+                var today = DateTime.Today;
+                var totalBookings = await context.Bookings.CountAsync();
+                var totalBookingsToday = await context.Bookings.CountAsync(b => b.BookingDate.Date == today);
+                var totalUsers = await context.Users.CountAsync();
+                var totalBookingsCompleted = await context.Bookings.CountAsync(b => b.Status == "Hoàn thành");
+
+                return new DashboardInfoDto
+                {
+                    TotalBookings = totalBookings,
+                    TotalBookingsToday = totalBookingsToday,
+                    TotalUsers = totalUsers,
+                    TotalBookingsCompleted = totalBookingsCompleted
+                };
+            }
+        }
+    } 
+ }

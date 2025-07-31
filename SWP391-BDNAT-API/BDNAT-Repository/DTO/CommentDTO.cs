@@ -11,7 +11,7 @@ namespace BDNAT_Repository.DTO
         public int UniqueId { get; set; }
 
         public int UserId { get; set; }
-
+        public string FullName { get; set; }
         public int BlogId { get; set; }
 
         public string Comment1 { get; set; } = null!;

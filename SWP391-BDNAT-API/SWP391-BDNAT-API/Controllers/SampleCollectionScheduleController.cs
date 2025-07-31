@@ -138,6 +138,10 @@ namespace SWP391_BDNAT_API.Controllers
                 var result = await _scheduleService.UpdateScheduleAssignTaskAsync(id, idStaff);
                 if (!result)
                     return NotFound($"Schedule with ID {id} not found");
+                else if(result == false)
+                {
+                    return BadRequest($"Assign Error check input again");
+                }
                 return Ok(result);
             }
             catch (Exception ex)

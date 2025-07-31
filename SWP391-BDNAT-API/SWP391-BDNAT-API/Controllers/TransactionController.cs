@@ -1,4 +1,5 @@
 ﻿using BDNAT_Repository.DTO;
+using BDNAT_Repository.Entities;
 using BDNAT_Repository.Implementation;
 using BDNAT_Service.Implementation;
 using BDNAT_Service.Interface;
@@ -122,5 +123,23 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, "Failed to handle webhook");
             }
         }
+
+        [HttpGet("transactions/total-amount")]
+        public async Task<IActionResult> GetTotalTransactionAmounts()
+        {
+            var result = await _transactionService.GetTotalAmountsAsync();
+            return Ok(result);
+        }
+
+        [HttpGet("revenue-stats")]
+        public async Task<IActionResult> GetRevenueStats([FromQuery] int year, [FromQuery] int? month, [FromQuery] int? week)
+        {
+            if (year <= 0)
+                return BadRequest(new { message = "Thiếu hoặc sai định dạng năm (year)!" });
+
+            var stats = await _transactionService.GetTransactionStatsAsync(year, month, week);
+            return Ok(stats);
+        }
+
     }
 }

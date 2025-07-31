@@ -31,8 +31,6 @@ namespace BDNAT_Repository.DTO
     {
         public int BookingId { get; set; }
         public string? FinalResult { get; set; }
-
-        public string? cfDNA { get; set; }
         public List<ResultDetailDTO> Results { get; set; } = new();
     }
 }

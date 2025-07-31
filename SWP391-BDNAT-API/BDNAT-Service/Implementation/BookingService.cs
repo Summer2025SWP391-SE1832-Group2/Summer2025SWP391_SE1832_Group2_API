@@ -194,29 +194,9 @@ namespace BDNAT_Service.Implementation
 
         public async Task<List<BookingDisplayDTO>> GetAllBookingsAsync()
         {
-            var list = await BookingRepo.Instance.GetAllBookingWithSchedule();
-            var result = list.Select(x =>
-            {
-                var schedule = x.SampleCollectionSchedules?.FirstOrDefault();
+            var list = await BookingRepo.Instance.GetAllBookingDisplaysAsync();
 
-                return new BookingDisplayDTO
-                {
-                    BookingId = x.BookingId,
-                    UserId = x.UserId,
-                    ServiceId = x.ServiceId,
-                    BookingDate = x.BookingDate,
-                    Status = x.Status,
-                    PaymentStatus = x.PaymentStatus,
-                    PreferredDate = x.PreferredDate,
-                    Method = x.Method,
-                    CollectionDate = schedule?.CollectionDate,
-                    Time = schedule?.Time,
-                    Location = schedule?.Location ?? "",
-                    hasSubmittedRating = x.Ratings.Any(),
-                };
-            }).ToList();
-
-            return result;
+            return list;
         }
 
         public async Task<List<BookingSampleDTO>> GetAllBookingWithSampleAsync()
@@ -227,32 +207,9 @@ namespace BDNAT_Service.Implementation
 
         public async Task<List<BookingScheduleDTO>> GetAllBookingWithScheduleAsync()
         {
-            var data = await BookingRepo.Instance.GetAllBookingWithSchedule();
+            var data = await BookingRepo.Instance.GetAllBookingSchedulesAsync();
 
-            var result = data.Select(b => new BookingScheduleDTO
-            {
-                BookingId = b.BookingId,
-                UserId = b.UserId,
-                FullName = b.User?.FullName,
-                BookingDate = b.BookingDate,
-                Status = b.Status,
-                PaymentStatus = b.PaymentStatus,
-                PreferredDate = b.PreferredDate,
-                Method = b.Method,
-                SampleCollectionSchedules = b.SampleCollectionSchedules?.Select(s => new SampleCollectionScheduleDTO
-                {
-                    ScheduleId = s.ScheduleId,
-                    BookingId = s.BookingId,
-                    CollectorId = s.CollectorId,
-                    CollectorName = s.Collector?.FullName,
-                    CollectionDate = s.CollectionDate,
-                    Time = s.Time,
-                    Location = s.Location,
-                    Status = s.Status
-                }).ToList()
-            }).ToList();
-
-            return result;
+            return data;
         }
 
         public async Task<BookingDisplayDetailDTO> GetBookingByIdAsync(int id)
@@ -268,26 +225,7 @@ namespace BDNAT_Service.Implementation
         {
             var list = await BookingRepo.Instance.GetBookingByUserIdAsync(id);
 
-            var result = list.Select(x =>
-            {
-                var schedule = x.SampleCollectionSchedules?.FirstOrDefault();
-
-                return new BookingDisplayDTO
-                {
-                    BookingId = x.BookingId,
-                    UserId = x.UserId,
-                    BookingDate = x.BookingDate,
-                    Status = x.Status,
-                    PaymentStatus = x.PaymentStatus,
-                    PreferredDate = x.PreferredDate,
-                    Method = x.Method,
-                    CollectionDate = schedule?.CollectionDate,
-                    Time = schedule?.Time,
-                    Location = schedule?.Location ?? ""
-                };
-            }).ToList();
-
-            return result;
+            return list;
         }
 
         public async Task<bool> UpdateBookingAsync(BookingDisplayDTO booking)
@@ -326,5 +264,24 @@ namespace BDNAT_Service.Implementation
             return result;
         }
 
+        public async Task<bool> CancelBookingAsync(int bookingId)
+        {
+            var check = await BookingRepo.Instance.CancelBookingAsync(bookingId);
+            if (check)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> RefundBookingAsync(long orderCode)
+        {
+            var check = await BookingRepo.Instance.RefundBookingAsync(orderCode);
+            if (check)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

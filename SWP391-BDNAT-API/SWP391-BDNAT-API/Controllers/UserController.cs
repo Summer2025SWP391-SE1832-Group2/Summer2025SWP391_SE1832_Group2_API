@@ -120,5 +120,12 @@ namespace SWP391_BDNAT_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("get-dashboard-info")]
+        public async Task<IActionResult> GetDashboardInfo()
+        {
+            var result = await _userService.GetDashboardInfoAsync();
+            return Ok(result);
+        }
     }
 }

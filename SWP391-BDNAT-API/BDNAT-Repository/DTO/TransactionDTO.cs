@@ -35,4 +35,19 @@ namespace BDNAT_Repository.DTO
 
         public DateTime? UpdatedAt { get; set; }
     }
+
+    public class TotalTransactionAmountsDto
+    {
+        public decimal TotalPaidAmount { get; set; }
+        public decimal TotalRefundedAmount { get; set; }
+
+        public int TotalSuccessfulTransactions { get; set; }
+        public int TotalRefundedTransactions { get; set; }
+    }
+
+    public class RevenuePeriodDto
+    {
+        public string Label { get; set; } = string.Empty;
+        public decimal Total { get; set; }
+    }
 }

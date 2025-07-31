@@ -20,21 +20,36 @@ namespace BDNAT_Service.Implementation
             _mapper = mapper;
         }
 
-        public async Task<bool> CreateFavoriteAsync(FavoriteDTO favorite)
+        public async Task<bool> CreateOrToggleFavoriteAsync(FavoriteDTO favorite)
         {
-            var exists = (await FavoriteRepo.Instance.GetAllAsync())
-                .Any(f => f.UserId == favorite.UserId && f.BlogId == favorite.BlogId);
+            var allFavorites = await FavoriteRepo.Instance.GetAllAsync();
+            var existingFavorite = allFavorites
+                .FirstOrDefault(f => f.UserId == favorite.UserId && f.BlogId == favorite.BlogId);
 
-            if (exists)
+            if (existingFavorite != null)
             {
-                return false;
+                // Nếu đã tồn tại, xóa
+                return await FavoriteRepo.Instance.DeleteAsync(existingFavorite.FavoriteId);
             }
-
-            var map = _mapper.Map<Favorite>(favorite);
-            return await FavoriteRepo.Instance.InsertAsync(map);
+            else
+            {
+                // Nếu chưa có, thêm mới
+                var newFavorite = _mapper.Map<Favorite>(favorite);
+                return await FavoriteRepo.Instance.InsertAsync(newFavorite);
+            }
         }
 
 
+        public async Task<List<FavoriteDTO>> GetFavoritesByBlogAsync(int blogId)
+        {
+            var favorites = await FavoriteRepo.Instance.GetFavoritesByBlogIdAsync(blogId);
+            return favorites.Select(f => new FavoriteDTO
+            {
+                FavoriteId = f.FavoriteId,
+                UserId = f.UserId,
+                BlogId = f.BlogId
+            }).ToList();
+        }
         public async Task<bool> DeleteFavoriteAsync(int id)
         {
             return await FavoriteRepo.Instance.DeleteAsync(id);

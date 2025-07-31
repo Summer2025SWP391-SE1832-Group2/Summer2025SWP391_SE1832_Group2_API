@@ -37,6 +37,8 @@ public partial class User
 
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 
     public virtual ICollection<SampleCollectionSchedule> SampleCollectionSchedules { get; set; } = new List<SampleCollectionSchedule>();
@@ -48,6 +50,8 @@ public partial class User
     public virtual ICollection<ShippingOrder> ShippingOrders { get; set; } = new List<ShippingOrder>();
 
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+
+    public virtual ICollection<UserNotificationToken> UserNotificationTokens { get; set; } = new List<UserNotificationToken>();
 
     public virtual ICollection<UserWorkSchedule> UserWorkSchedules { get; set; } = new List<UserWorkSchedule>();
 }

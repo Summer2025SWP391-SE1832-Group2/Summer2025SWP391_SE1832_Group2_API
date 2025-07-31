@@ -11,6 +11,7 @@ namespace BDNAT_Service.Interface
     {
         Task<List<UserDTO>> GetAllUsersAsync();
         Task<UserDTO> GetUserByIdAsync(int id);
+        Task<DashboardInfoDto> GetDashboardInfoAsync();
         Task<bool> CreateUserAsync(UserDTO User);
         Task<bool> UpdateUserAsync(UserDTO User);
         Task<bool> DeleteUserAsync(int id);

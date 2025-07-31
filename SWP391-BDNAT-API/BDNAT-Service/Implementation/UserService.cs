@@ -65,6 +65,10 @@ namespace BDNAT_Service.Implementation
             return true;
         }
 
+        public async Task<DashboardInfoDto> GetDashboardInfoAsync()
+        {
+            return await UserRepo.Instance.GetDashboardInfoAsync();
+        }
     }
 
 }

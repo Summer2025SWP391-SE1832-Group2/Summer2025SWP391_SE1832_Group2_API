@@ -1,5 +1,6 @@
 ﻿using BDNAT_Repository.DTO;
 using BDNAT_Repository.Implementation;
+using BDNAT_Service.Implementation;
 using BDNAT_Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -165,6 +166,16 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpPut("refund")]
+        public async Task<IActionResult> RefundBooking([FromBody]long orderCode)
+        {
+             var result = await _bookingService.RefundBookingAsync(orderCode);
+            if (!result)
+                return BadRequest("Không thể hoàn tiền. Mã đơn hàng không hợp lệ.");
+
+            return Ok("Hoàn tiền thành công.");
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteBooking(int id)
         {
@@ -196,5 +207,15 @@ namespace SWP391_BDNAT_API.Controllers
             }
         }
 
+        [HttpPut("cancel-booking")]
+        public async Task<IActionResult> CancelBooking(int bookingId)
+        {
+            var result = await _bookingService.CancelBookingAsync(bookingId);
+
+            if (!result)
+                return NotFound(new { message = "Không tìm thấy booking phù hợp hoặc đã hủy trước đó." });
+
+            return Ok(new { message = "Đã hủy booking và cập nhật trạng thái giao dịch." });
+        }
     }
 }

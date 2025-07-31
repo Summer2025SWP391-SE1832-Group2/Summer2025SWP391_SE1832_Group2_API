@@ -18,7 +18,8 @@ namespace BDNAT_Service.Interface
         Task<bool> UpdateTransactionAsync(TransactionDTO transaction);
         Task<bool> DeleteTransactionAsync(int id);
         Task<TransactionDTO> GetByOrderCodeAsync(long orderCode);
-
+        Task<TotalTransactionAmountsDto> GetTotalAmountsAsync();
         Task<bool> HandleWebhookAsync(JsonElement payload);
+        Task<List<RevenuePeriodDto>> GetTransactionStatsAsync(int year, int? month = null, int? week = null);
     }
 }

@@ -26,7 +26,9 @@ namespace BDNAT_Repository
 
             CreateMap<SampleCollectionSchedule, SampleCollectionScheduleDTO>().ReverseMap();
 
-            CreateMap<Comment, CommentDTO>().ReverseMap();
+            CreateMap<Comment, CommentDTO>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+                .ReverseMap();
             CreateMap<Favorite, FavoriteDTO>().ReverseMap();
             CreateMap<Feedback, FeedbackDTO>().ReverseMap();
             CreateMap<KitOrder, KitOrderDTO>().ReverseMap();
@@ -49,6 +51,7 @@ namespace BDNAT_Repository
             CreateMap<Team, TeamDTO>().ReverseMap();
             CreateMap<WorkSchedule, WorkScheduleDTO>().ReverseMap();
             CreateMap<UserWorkSchedule, UserWorkScheduleDTO>().ReverseMap();
+            CreateMap<Notification, NotificationDTO>().ReverseMap();
         }
     }
 }

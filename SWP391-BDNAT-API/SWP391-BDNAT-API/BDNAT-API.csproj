@@ -19,6 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+	  <None Update="swp391-dna-testing-system-firebase-adminsdk.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
     <Folder Include="Data\" />
   </ItemGroup>
 

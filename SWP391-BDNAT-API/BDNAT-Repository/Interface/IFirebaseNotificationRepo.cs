@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BDNAT_Repository.Interface
 {
-    public interface IBookingRepo : IGenericRepository<Booking>
+    internal interface IFirebaseNotificationRepo : IGenericRepository<UserNotificationToken>
     {
     }
 }

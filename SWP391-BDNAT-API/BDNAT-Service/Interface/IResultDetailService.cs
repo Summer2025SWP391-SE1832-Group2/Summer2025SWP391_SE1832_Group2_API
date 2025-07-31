@@ -1,5 +1,6 @@
 ﻿using BDNAT_Repository.DTO;
 using BDNAT_Repository.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,6 @@ namespace BDNAT_Service.Interface
         Task<List<ResultDetailDTO>> GetResultDetailsByBookingIdAsync(int BookingId);
         Task<bool> DeleteBySampleIdAsync(int sampleId);
         Task<bool> DeleteByBookingIdAsync(int bookingId);
+        Task<bool> ProcessExcelAndCreateResultsAsync(IFormFile file);
     }
 }

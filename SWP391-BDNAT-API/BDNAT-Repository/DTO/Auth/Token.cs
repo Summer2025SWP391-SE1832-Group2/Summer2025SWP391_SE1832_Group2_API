@@ -12,4 +12,10 @@ namespace BDNAT_Repository.DTO.Auth
         public string RefreshToken { get; set; }
         public DateTime ExpiredAt { get; set; }
     }
+
+    public class FCMToken
+    {
+        public int UserId { get; set; }
+        public string Token { get; set; } = null!;
+    }
 }

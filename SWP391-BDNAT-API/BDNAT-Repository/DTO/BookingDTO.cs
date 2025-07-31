@@ -31,7 +31,7 @@ namespace BDNAT_Repository.DTO
 
         public int? UserId { get; set; }
         public int? ServiceId { get; set; }
-
+        public string? ServiceName { get; set; }
         public DateTime? BookingDate { get; set; }
 
         public string? Status { get; set; }
@@ -49,6 +49,8 @@ namespace BDNAT_Repository.DTO
         public string Location { get; set; } = null!;
 
         public bool hasSubmittedRating { get; set; }
+
+        public long? OrderCode { get; set; }
     }
 
     public class BookingDisplayDetailDTO
@@ -57,8 +59,8 @@ namespace BDNAT_Repository.DTO
 
         public int? UserId { get; set; }
         public int? ServiceId { get; set; }
+        public string? ServiceName { get; set; }
         public string? FullName { get; set; }
-
         public DateTime? BookingDate { get; set; }
 
         public string? Status { get; set; }
@@ -79,6 +81,8 @@ namespace BDNAT_Repository.DTO
 
         public bool hasSubmittedRating { get; set; }
 
+        public long? OrderCode { get; set; }
+
         public List<ResultDetailDTO>? ResultDetails { get; set; }
     }
 
@@ -98,6 +102,8 @@ namespace BDNAT_Repository.DTO
         public DateTime? PreferredDate { get; set; }
 
         public string Method { get; set; } = null!;
+
+        public long? OrderCode { get; set; }
 
         public List<SampleCollectionScheduleDTO>? SampleCollectionSchedules { get; set; }
     }
@@ -123,5 +129,12 @@ namespace BDNAT_Repository.DTO
         public string? FinalResult { get; set; }
 
         public List<SampleDTO>? Samples { get; set; }
+    }
+
+    public class NotificationRequest
+    {
+        public string Title { get; set; } = null!;
+        public string Body { get; set; } = null!;
+        public string DeviceToken { get; set; } = null!;
     }
 }

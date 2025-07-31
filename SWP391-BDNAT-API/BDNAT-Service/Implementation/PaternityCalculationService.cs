@@ -244,17 +244,17 @@ namespace BDNAT_Service.Implementation
         private string GetConclusion(double w, double cpi)
         {
             if (cpi == 0)
-                return "Loại trừ - Không phải là cha";
+                return "Loại trừ quan hệ huyết thống – không có bằng chứng cho thấy có quan hệ huyết thống.";
             else if (w >= 0.9999)
-                return "Rất chắc chắn là cha";
+                return "Rất chắc chắn có quan hệ huyết thống.";
             else if (w >= 0.999)
-                return "Chắc chắn là cha";
+                return "Chắc chắn có quan hệ huyết thống.";
             else if (w >= 0.99)
-                return "Có khả năng cao là cha";
+                return "Có khả năng cao có quan hệ huyết thống.";
             else if (w >= 0.9)
-                return "Có khả năng là cha";
+                return "Có thể có quan hệ huyết thống.";
             else
-                return "Không đủ bằng chứng";
+                return "Không đủ bằng chứng để xác nhận quan hệ huyết thống.";
         }
 
         // Phương thức helper để parse input string thành array

@@ -56,13 +56,37 @@ namespace BDNAT_Service.Implementation
             return await SampleCollectionScheduleRepo.Instance.UpdateAsync(mapSchedule);
         }
 
-        public async Task<bool> UpdateScheduleAssignTaskAsync(int id, int idStaff)
+        public async Task<bool> UpdateScheduleAssignTaskAsync(int scheduleId, int staffId)
         {
-            var schedule = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(id);
+            var schedule = await SampleCollectionScheduleRepo.Instance.GetByIdAsync(scheduleId);
             if (schedule == null)
                 return false;
 
-            schedule.CollectorId = idStaff;
+            var booking = await BookingRepo.Instance.GetByIdAsync(schedule.BookingId);
+            if (booking == null)
+                return false;
+
+            var service = await ServiceRepo.Instance.GetByIdAsync(booking.ServiceId);
+            if (service == null)
+                return false;
+
+            var user = await UserRepo.Instance.GetByIdAsync(staffId);
+            if (user == null) return false;
+            var role = user.Role;
+
+            bool isAllowed = role switch
+            {
+                "Admin" => true,
+                "Manager" => true,
+                "HomeStaff" => service.IsStaffSuport == true,
+                "ShipStaff" => service.IsAtHome == true,
+                _ => false
+            };
+
+            if (!isAllowed)
+                return false;
+
+            schedule.CollectorId = staffId;
             return await SampleCollectionScheduleRepo.Instance.UpdateAsync(schedule);
         }
 

@@ -11,8 +11,9 @@ namespace BDNAT_Service.Interface
     {
         Task<List<FavoriteDTO>> GetAllFavoritesAsync();
         Task<FavoriteDTO> GetFavoriteByIdAsync(int id);
-        Task<bool> CreateFavoriteAsync(FavoriteDTO favorite);
+        Task<bool> CreateOrToggleFavoriteAsync(FavoriteDTO favorite);
         Task<bool> UpdateFavoriteAsync(FavoriteDTO favorite);
         Task<bool> DeleteFavoriteAsync(int id);
+        Task<List<FavoriteDTO>> GetFavoritesByBlogAsync(int blogId);
     }
 }

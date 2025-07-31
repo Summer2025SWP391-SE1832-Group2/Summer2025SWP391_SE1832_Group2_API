@@ -20,5 +20,7 @@ namespace BDNAT_Service.Interface
         Task<bool> DeleteBookingAsync(int id);
         Task<string?> RegeneratePaymentQrAsync(int bookingId);
         Task<List<BookingScheduleDTO>> GetBookingsByCollectorAsync(int collectorId);
+        Task<bool> CancelBookingAsync(int bookingId);
+        Task<bool> RefundBookingAsync(long orderCode);
     }
 }

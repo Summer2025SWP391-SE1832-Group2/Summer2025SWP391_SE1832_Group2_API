@@ -159,5 +159,22 @@ namespace SWP391_BDNAT_API.Controllers
                 return Ok("Deleted results by BookingId successfully.");
             return NotFound("No results found for the given BookingId.");
         }
+
+        [HttpPost("upload-excel")]
+        public async Task<IActionResult> UploadExcelAndCreateResult(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File Excel không hợp lệ.");
+
+            try
+            {
+                var success = await _resultService.ProcessExcelAndCreateResultsAsync(file);
+                return success ? Ok("Tạo kết quả thành công") : StatusCode(500, "Tạo kết quả thất bại.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi xử lý: {ex.Message}");
+            }
+        }
     }
 }

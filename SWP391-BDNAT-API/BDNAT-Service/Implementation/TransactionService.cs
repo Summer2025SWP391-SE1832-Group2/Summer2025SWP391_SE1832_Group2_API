@@ -93,7 +93,8 @@ namespace BDNAT_Service.Implementation
                 booking.PaymentStatus = "Đã thanh toán";
                 var updatebooking = await BookingRepo.Instance.UpdateAsync(booking);
                 Console.WriteLine(updateTran ? "[INFO] Booking updated successfully." : "[ERROR] Failed to update booking.");
-                if (updateTran != true || updatebooking != true) { 
+                if (updateTran != true || updatebooking != true)
+                {
                     return false;
                 }
 
@@ -111,6 +112,15 @@ namespace BDNAT_Service.Implementation
             var list = await TransactionRepo.Instance.GetTransactionByUserIdAsync(Uid);
             return list.Select(x => _mapper.Map<TransactionDTO>(x)).ToList();
         }
-    }
 
+        public async Task<TotalTransactionAmountsDto> GetTotalAmountsAsync()
+        {
+            return await TransactionRepo.Instance.GetTotalAmountsAsync();
+        }
+
+        public async Task<List<RevenuePeriodDto>> GetTransactionStatsAsync(int year, int? month = null, int? week = null)
+        {
+            return await TransactionRepo.Instance.GetTransactionStatsAsync(year, month, week);
+        }
+    }
 }

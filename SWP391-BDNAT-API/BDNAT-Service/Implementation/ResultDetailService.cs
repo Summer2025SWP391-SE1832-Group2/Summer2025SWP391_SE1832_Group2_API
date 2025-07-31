@@ -8,6 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
+using System.Globalization;
+using Microsoft.IdentityModel.Tokens;
+using Azure.Core;
 
 namespace BDNAT_Service.Implementation
 {
@@ -15,11 +20,16 @@ namespace BDNAT_Service.Implementation
     {
         private readonly IMapper _mapper;
         private readonly PaternityCalculationService _paternityCalculationService;
-        public ResultDetailService(IMapper mapper, PaternityCalculationService paternityCalculationService)
+        private readonly FirebaseNotificationService _fcmService;
+        private readonly INotificationService _notificationService;
+        public ResultDetailService(IMapper mapper, PaternityCalculationService paternityCalculationService, INotificationService notificationService)
         {
             _paternityCalculationService = paternityCalculationService;
 
             _mapper = mapper;
+
+            _fcmService = new FirebaseNotificationService();
+            _notificationService = notificationService;
         }
 
         public async Task<bool> CreateResultAsync(ResultDetailDTO result)
@@ -27,31 +37,6 @@ namespace BDNAT_Service.Implementation
             var map = _mapper.Map<ResultDetail>(result);
             return await ResultDetailRepo.Instance.InsertAsync(map);
         }
-
-        /*public async Task<bool> CreateMultipleResultsAsync(SaveResultDetailRequest dto)
-        {
-            var updateBooking = await BookingRepo.Instance.GetById(dto.BookingId);
-            updateBooking.FinalResult = dto.FinalResult;
-            updateBooking.Status = "Hoàn thành";
-            var check = await BookingRepo.Instance.UpdateAsync(updateBooking);
-            if (check)
-            {
-                if (dto.Results == null || !dto.Results.Any())
-                    return false;
-
-                var resultEntities = dto.Results.Select(r => new ResultDetail
-                {
-                    BookingId = dto.BookingId,
-                    TestParameterId = r.TestParameterId ?? 0,
-                    Value = r.Value,
-                    SampleId = r.SampleId ?? 0
-                }).ToList();
-
-                await ResultDetailRepo.Instance.AddRangeAsync(resultEntities);
-                return true;
-            }
-            return false;
-        }*/
 
         public async Task<bool> DeleteResultAsync(int id)
         {
@@ -98,9 +83,66 @@ namespace BDNAT_Service.Implementation
 
             try
             {
-                // Lấy danh sách result hiện tại trong DB
-                var existingResults = await ResultDetailRepo.Instance.GetResultDetailsByBookingIdAsync(dto.BookingId);
+                var updateBooking = await BookingRepo.Instance.GetById(dto.BookingId);
+                if (updateBooking == null) return false;
 
+                var service = await ServiceRepo.Instance.GetById(updateBooking.ServiceId);
+                if (service == null) return false;
+
+                bool isNipt = service.Name != null &&
+                              service.Name.Contains("NIPT", StringComparison.OrdinalIgnoreCase);
+
+                string calculatedResult = dto.FinalResult;
+
+                // 1. Tính kết quả nếu là NIPT
+                if (isNipt)
+                {
+                    calculatedResult = GenerateNiptConclusion(dto);
+                }
+                else
+                {
+                    var isDnaPaternityTest = CheckIfDnaPaternityTest(dto.Results);
+
+                    if (isDnaPaternityTest)
+                    {
+                        try
+                        {
+                            var paternityResult = _paternityCalculationService.CalculateFromResultDetails(dto.Results);
+                            var detailedReport = _paternityCalculationService.GeneratePaternityReport(paternityResult, dto.Results);
+
+                            calculatedResult = paternityResult.W * 100 + "% " + paternityResult.Conclusion;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Lỗi khi tính toán xác suất cha con: {ex.Message}");
+                            calculatedResult = dto.FinalResult ?? "Không thể tính toán được kết quả";
+                        }
+                    }
+                }
+
+                // 2. Cập nhật kết quả cuối và trạng thái cho booking
+                updateBooking.FinalResult = calculatedResult;
+                updateBooking.Status = "Hoàn thành";
+                var bookingUpdated = await BookingRepo.Instance.UpdateAsync(updateBooking);
+
+                if (!bookingUpdated)
+                    return false;
+
+                // 3. Lấy result cũ trong DB
+                var existingResults = await ResultDetailRepo.Instance.GetResultDetailsByBookingIdAsync(dto.BookingId);
+                if (existingResults == null || !existingResults.Any())
+                    return false;
+
+                // 4. Nếu không phải NIPT, tính PI để cập nhật vào ResultDetail
+                Dictionary<string, double>? piLookup = null;
+
+                if (!isNipt)
+                {
+                    var paternityResult = _paternityCalculationService.CalculateFromResultDetails(dto.Results);
+                    piLookup = paternityResult.Comparisons.ToDictionary(c => c.Locus, c => c.PI);
+                }
+
+                // 5. Cập nhật từng kết quả
                 foreach (var updateItem in dto.Results)
                 {
                     var result = existingResults.FirstOrDefault(r => r.ResultDetailId == updateItem.ResultDetailId);
@@ -109,59 +151,56 @@ namespace BDNAT_Service.Implementation
                         result.Value = updateItem.Value;
                         result.TestParameterId = updateItem.TestParameterId ?? result.TestParameterId;
                         result.SampleId = updateItem.SampleId ?? result.SampleId;
-                    }
-                }
 
-                // Cập nhật batch
-                var updated = await ResultDetailRepo.Instance.UpdateRangeAsync(existingResults);
-                if (!updated)
-                    return false;
+                        // Reset PI nếu không có giá trị
+                        if (string.IsNullOrWhiteSpace(result.Value))
+                            result.Pi = null;
 
-                // Lấy lại thông tin booking
-                var booking = await BookingRepo.Instance.GetById(dto.BookingId);
-                if (booking == null) return false;
-
-                // Kiểm tra có phải NIPT không
-                bool isNipt = booking.Service?.Name != null &&
-                              booking.Service.Name.Contains("NIPT", StringComparison.OrdinalIgnoreCase);
-
-                string calculatedResult = dto.FinalResult;
-
-                // Nếu không phải NIPT, tính toán lại kết quả cha-con
-                if (isNipt)
-                {
-                    calculatedResult = GenerateNiptConclusion(dto);
-                }
-                else
-                {
-                    // Tính toán xác suất quan hệ cha con nếu không phải NIPT
-                    if (dto.Results != null && dto.Results.Any())
-                    {
-                        var isDnaPaternityTest = CheckIfDnaPaternityTest(dto.Results);
-
-                        if (isDnaPaternityTest)
+                        // Nếu không phải NIPT và dữ liệu phù hợp thì gán lại PI
+                        if (!isNipt &&
+                            !string.IsNullOrEmpty(updateItem.ParameterName) &&
+                            piLookup != null &&
+                            piLookup.ContainsKey(updateItem.ParameterName))
                         {
-                            try
-                            {
-                                var paternityResult = _paternityCalculationService.CalculateFromResultDetails(dto.Results);
-                                var detailedReport = _paternityCalculationService.GeneratePaternityReport(paternityResult, dto.Results);
+                            var sampleIds = dto.Results
+                                .Where(x => x.ParameterName == updateItem.ParameterName)
+                                .Select(x => x.SampleId ?? 0)
+                                .Distinct()
+                                .OrderBy(x => x)
+                                .ToList();
 
-                                calculatedResult = paternityResult.W * 100 + "% " + paternityResult.Conclusion;
-                            }
-                            catch (Exception ex)
+                            if (sampleIds.Count >= 2 && updateItem.SampleId == sampleIds[0])
                             {
-                                Console.WriteLine($"Lỗi khi tính toán xác suất cha con: {ex.Message}");
-                                calculatedResult = dto.FinalResult ?? "Không thể tính toán được kết quả";
+                                result.Pi = piLookup[updateItem.ParameterName];
                             }
                         }
                     }
                 }
 
-                // Cập nhật Booking
-                booking.FinalResult = calculatedResult;
-                booking.Status = "Hoàn thành";
+                var checkUpdate = await ResultDetailRepo.Instance.UpdateRangeAsync(existingResults);
+                if (!checkUpdate) return false;
 
-                return await BookingRepo.Instance.UpdateAsync(booking);
+                var user = await UserRepo.Instance.GetById(updateBooking.UserId);
+                if (user == null) return false;
+
+                var notificationToken = await FirebaseNotificationRepo.Instance.GetLatestValidTokenByUserIdAsync(user.UserId);
+                if (string.IsNullOrWhiteSpace(notificationToken?.Token)) return false;
+
+                string title = "Đã cập nhật kết quả mới!";
+                string body = "Vui lòng kiểm tra hồ sơ xét nghiệm.Booking ID: " + updateBooking.BookingId;
+
+                await _fcmService.SendNotificationAsync(title, body, notificationToken.Token);
+
+                var notification = new NotificationDTO
+                {
+                    UserId = updateBooking.UserId,
+                    Title = title,
+                    Body = body,
+                    ReceivedAt = DateTime.UtcNow,
+                    IsRead = false
+                };
+
+                return await _notificationService.CreateNotificationAsync(notification);
             }
             catch (Exception ex)
             {
@@ -173,11 +212,12 @@ namespace BDNAT_Service.Implementation
         public async Task<bool> CreateMultipleResultsAsync(SaveResultDetailRequest dto)
         {
             var updateBooking = await BookingRepo.Instance.GetById(dto.BookingId);
+            var service = await ServiceRepo.Instance.GetById(updateBooking.ServiceId);
 
             try
             {
-                bool isNipt = updateBooking.Service?.Name != null &&
-                              updateBooking.Service.Name.Contains("NIPT", StringComparison.OrdinalIgnoreCase);
+                bool isNipt = service.Name != null &&
+                              service.Name.Contains("NIPT", StringComparison.OrdinalIgnoreCase);
 
                 string calculatedResult = dto.FinalResult;
 
@@ -263,7 +303,29 @@ namespace BDNAT_Service.Implementation
                 }
 
                 await ResultDetailRepo.Instance.AddRangeAsync(resultEntities);
-                return true;
+
+                var user = await UserRepo.Instance.GetById(updateBooking.UserId);
+                if (user == null) return false;
+
+                var notificationToken = await FirebaseNotificationRepo.Instance.GetLatestValidTokenByUserIdAsync(user.UserId);
+                if (string.IsNullOrWhiteSpace(notificationToken?.Token)) return false;
+
+                string title = "Đã cập nhật kết quả!";
+                string body = "Vui lòng kiểm tra hồ sơ xét nghiệm.Booking ID: " + updateBooking.BookingId;
+
+
+                await _fcmService.SendNotificationAsync(title, body, notificationToken.Token);
+
+                var notification = new NotificationDTO
+                {
+                    UserId = updateBooking.UserId,
+                    Title = title,
+                    Body = body,
+                    ReceivedAt = DateTime.UtcNow,
+                    IsRead = false
+                };
+
+                return await _notificationService.CreateNotificationAsync(notification);
             }
             catch (Exception ex)
             {
@@ -274,35 +336,32 @@ namespace BDNAT_Service.Implementation
 
         public string GenerateNiptConclusion(SaveResultDetailRequest dto)
         {
-            string cfDnaConclusionNote = string.Empty;
             string result = string.Empty;
 
-            // Parse cfDNA value
-            if (!double.TryParse(dto.cfDNA, out var fetalFraction))
+            var cfDnaParam = dto.Results.FirstOrDefault(r =>
+                !string.IsNullOrEmpty(r.ParameterName) &&
+                r.ParameterName.Trim().Equals("cfDNA", StringComparison.OrdinalIgnoreCase));
+
+            if (cfDnaParam == null || !double.TryParse(cfDnaParam.Value?.Replace("%", "").Trim(), out var fetalFraction))
             {
                 return "Không thể xác định được cfDNA hợp lệ.";
             }
 
-            // Nếu cfDNA < 4% thì không xác định được
-            if (fetalFraction/100 < 4.0)
+            if (fetalFraction < 4.0)
             {
                 return "Fetal Fraction quá thấp (<4%). Không xác định được nguy cơ cho các trisomy.";
             }
 
-            // Dictionary lưu kết luận cho từng loại trisomy
             var conclusions = new Dictionary<string, string>();
 
             foreach (var trisomy in new[] { "21", "18", "13" })
             {
-                var paramName = $"Z-score (Trisomy {trisomy})";
-                var resultParam = dto.Results.FirstOrDefault(r => r.ParameterName == paramName);
+                var paramName = $"Trisomy {trisomy}";
+                var resultParam = dto.Results.FirstOrDefault(r => r.ParameterName?.Trim() == paramName);
 
                 if (resultParam != null && double.TryParse(resultParam.Value, out var zScore))
                 {
-                    if (zScore > 2.5)
-                        conclusions[trisomy] = "Nguy cơ cao";
-                    else
-                        conclusions[trisomy] = "Nguy cơ thấp";
+                    conclusions[trisomy] = zScore > 2.5 ? "Nguy cơ cao" : "Nguy cơ thấp";
                 }
                 else
                 {
@@ -310,10 +369,9 @@ namespace BDNAT_Service.Implementation
                 }
             }
 
-            // Format kết luận
-            result = $"Kết quả NIPT:\n" +
-                     $"- Trisomy 21: {conclusions["21"]}\n" +
-                     $"- Trisomy 18: {conclusions["18"]}\n" +
+            result = $"Kết quả NIPT: " +
+                     $"- Trisomy 21: {conclusions["21"]} " +
+                     $"- Trisomy 18: {conclusions["18"]} " +
                      $"- Trisomy 13: {conclusions["13"]}";
 
             return result;
@@ -340,6 +398,47 @@ namespace BDNAT_Service.Implementation
         public PaternityResult CalculatePaternityPreview(List<ResultDetailDTO> results)
         {
             return _paternityCalculationService.CalculateFromResultDetails(results);
+        }
+
+        public async Task<bool> ProcessExcelAndCreateResultsAsync(IFormFile file)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            using var package = new ExcelPackage(stream);
+            var worksheet = package.Workbook.Worksheets[0];
+            var rowCount = worksheet.Dimension.End.Row;
+
+            for (int row = 2; row <= rowCount; row++)
+            {
+                if (!int.TryParse(worksheet.Cells[row, 1].Text, out int bookingId))
+                    continue;
+
+                var request = new SaveResultDetailRequest
+                {
+                    BookingId = bookingId,
+                    FinalResult = worksheet.Cells[row, 2].Text,
+                    //cfDNA = worksheet.Cells[row, 3].Text,
+                    Results = new List<ResultDetailDTO>
+                {
+                    new ResultDetailDTO
+                    {
+                        TestParameterId = int.TryParse(worksheet.Cells[row, 4].Text, out var testParamId) ? testParamId : null,
+                        ParameterName = worksheet.Cells[row, 5].Text,
+                        Description = worksheet.Cells[row, 6].Text,
+                        Value = worksheet.Cells[row, 7].Text,
+                        SampleId = int.TryParse(worksheet.Cells[row, 8].Text, out var sampleId) ? sampleId : null,
+                        SampleOwnerName = worksheet.Cells[row, 9].Text,
+                        Pi = double.TryParse(worksheet.Cells[row, 10].Text, NumberStyles.Any, CultureInfo.InvariantCulture, out var pi) ? pi : null
+                    }
+                }
+                };
+
+                await CreateMultipleResultsAsync(request);
+            }
+
+            return true;
         }
     }
 
